@@ -1,192 +1,83 @@
 # Modern 10
 
-**A dark and light, glassy, macOS-inspired look for Windows 10 - one window, nothing to install.**
+![Version](https://img.shields.io/badge/version-2.0-0A84FF)
+![Windows](https://img.shields.io/badge/Windows-10-0078D4?logo=windows&logoColor=white)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
+![Windows Forms](https://img.shields.io/badge/GUI-Windows%20Forms-6E56CF)
+![.NET](https://img.shields.io/badge/.NET-System.Drawing-512BD4?logo=dotnet&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-Developed by **Tasmon Islam** - tasmon@outlook.com
+A dark and light, glassy, macOS-inspired look for Windows 10. One window, nothing to install, every change backed up and reversible.
 
-Modern 10 only changes **built-in Windows settings**. It draws its own wallpaper, lock screen and
-**icons** locally (several wallpaper styles and icon themes to choose from), puts the taskbar at the **top or bottom**, sets the **taskbar icon size** and can
-**auto-hide** the taskbar for a dock-like feel. Every value it touches is backed up first, so one button puts
-everything back.
+## Quick start
 
-> No themes to patch, no DLL injection, no startup apps, no services, no downloads.
-
----
-
-## Start it
-
-1. Download or clone this folder. If you downloaded a ZIP, right-click it > **Properties** > tick **Unblock** > OK, then extract.
-2. Double-click **`Modern10.cmd`**. The Modern 10 window opens (there is no console and no command line to learn).
+1. Download this folder. If it came as a ZIP: right-click it > **Properties** > tick **Unblock** > OK, then extract.
+2. Double-click **`Modern10.cmd`**.
 3. Pick your options and press **Apply**. Press **Restore original** to undo everything.
 
-`Modern10.cmd` only starts the window with `-ExecutionPolicy Bypass` for that one process; your system policy is not changed.
+## What you can change
 
-## The window
-
-| Control | What it does |
+| Option | Choices |
 |---|---|
-| Theme: Dark / Light | Two complete looks: deep navy-violet glass and soft pastel glass |
-| Taskbar position | **Top** (menu-bar style) or **Bottom** (Windows default) |
-| Taskbar icon size | **Small** (16px), **Default** (32px) or **Keep** your current size |
-| Taskbar behaviour | **Keep**, **Always show** or **Auto-hide** |
-| Wallpaper | Choose **Aurora, Waves, Sunset, Ocean, Emerald, Graphite, Nebula, Rose, Midnight, Citrus, Arctic, Dunes, Lagoon** (13 styles, each in a dark and a light version, drawn at your screen resolution, no downloads) or **your own image**. A live preview shows the choice |
-| Lock screen style | **Same as wallpaper** or any of the 13 styles on its own |
-| Icon theme | 11 packs - **Glass** (blue), **Graphite**, **Sunset**, **Emerald**, **Violet**, **Rose**, **Amber**, **Ocean**, **Crimson**, **Mint**, **Midnight** - each in a dark and a light version, with a live preview |
-| System, drive, folder-type icons | This PC, User, Network, Control Panel, Quick access, Libraries, OneDrive, Recycle Bin (empty/full), **every folder, every drive and ZIP archives** |
-| This PC folder icons | 3D Objects, Desktop, Documents, Downloads, Music, Pictures, Videos |
-| Profile folder icons | The same folders when you browse inside your user profile (`desktop.ini`) |
-| All users too | Also writes the generic folder icon and drive icons machine-wide (one UAC prompt) |
-| Dock options | A dock-style preset (no extra software) plus two **optional** add-ons, KiraDock and TaskbarX, that are installed only if you tick them and press *Install selected* |
-| Icon preview | Shows the icons that will be drawn for the selected theme |
+| Theme | Dark or Light |
+| Taskbar | Top or bottom, small or default icons, always show or auto-hide |
+| Wallpaper | 13 styles (Aurora, Waves, Sunset, Ocean, Emerald, Graphite, Nebula, Rose, Midnight, Citrus, Arctic, Dunes, Lagoon) or your own image |
+| Lock screen | Same as the wallpaper, or any of the 13 styles |
+| Icon theme | 11 packs (Glass, Graphite, Sunset, Emerald, Violet, Rose, Amber, Ocean, Crimson, Mint, Midnight) |
+| Icons applied to | This PC, User, Network, Control Panel, Quick access, Libraries, OneDrive, Recycle Bin, drives, ZIP files, the standard folders and every other folder |
+| Dock options | A dock-style preset, plus optional KiraDock and TaskbarX (see below) |
 
-The log under the buttons shows each step. A summary at the end lists what worked, and the same text is written to
-`C:\ProgramData\Modern10\modern10.log`. A failing step never stops the others.
+Wallpapers, lock screens and icons are drawn on your PC. Nothing is downloaded.
+
+## Optional dock add-ons
+
+Open **Dock options...** in the app. Nothing is installed unless you tick it and press **Install selected**.
+
+| App | Purpose |
+|---|---|
+| [KiraDock](https://apps.microsoft.com/detail/9NPD1H35D0WD) | A macOS-style floating dock for your favourite apps (Microsoft Store) |
+| [TaskbarX](https://github.com/ChrisAnd1998/TaskbarX/releases) | Centres and animates the taskbar icons (GitHub) |
 
 ## Requirements
 
-- Windows 10 (built for 1809 and newer; the approach is the same on 22H2)
-- Windows PowerShell 5.1 (already included in Windows 10)
-- No admin rights for the normal path. A UAC prompt appears only for the **generic folder icon** (and the machine-level drive icons that go with it), for the lock screen fallback, or to clean up older overrides.
+- Windows 10 with Windows PowerShell 5.1 (already included)
+- No admin rights for most changes. A UAC prompt appears only for the all-users folder and drive icons and the lock screen fallback.
 
-> Windows 10 reached end of support on 14 October 2025. If you are still on it, keep an eye on your update/security plan.
+## Good to know
 
-## Why the icons did not change in the old version (fixed in 2.0)
-
-1. **Wrong place for the shell icons.** This PC and its folders (Documents, Downloads, ...) read their icon from
-   `HKCU\Software\Classes\CLSID\{GUID}\DefaultIcon`. Version 1 wrote only to the desktop-icon location
-   (`HKCU\...\Explorer\CLSID\...`), which does not affect the This PC view. Version 2 writes both.
-2. **The "(Default)" value was never really set.** The old code created a value literally named `(default)`.
-   Explorer ignores it. Version 2 writes the real unnamed default value through the .NET registry API.
-3. **Missing folders.** 3D Objects and the This PC folder GUIDs were not covered at all. Both the current and
-   the legacy GUID of each folder are now written.
-4. **Cache and refresh.** Explorer's icon cache is cleared while Explorer is stopped, and the shell is notified
-   again after it restarts (`SHChangeNotify` and `ie4uinit -show`).
-5. **Verification.** After writing, the engine reads every entry back and reports how many are really in place.
-
-If the log still says an entry is missing, send me that log line.
-
-## Wallpaper: what changed in 2.0.1
-
-The wallpaper is now set through the same COM interface the Settings app uses (`IDesktopWallpaper`) plus the classic
-`SystemParametersInfo` call. A slideshow is switched off, the cached `TranscodedWallpaper` is removed, every apply uses a
-new file name (so Windows cannot serve an old copy), and the result is read back and logged. The wallpaper is checked
-again after Explorer restarts. If a work policy forces the wallpaper, the log says so.
-
-## Universal icon replacement
-
-Besides This PC and its folders, Modern 10 writes per-user class-level overrides so that Explorer uses the chosen theme everywhere:
-
-| Registry key (under `HKCU\Software\Classes`) | Covers |
-|---|---|
-| `Folder\DefaultIcon`, `Directory\DefaultIcon` | every ordinary folder |
-| `Drive\DefaultIcon`, `Applications\Explorer.exe\Drives\<letter>` | every drive |
-| `CompressedFolder\DefaultIcon` | ZIP archives |
-| `CLSID\{GUID}\DefaultIcon` | This PC, User, Network, Control Panel, Recycle Bin, Quick access, Libraries, OneDrive and the seven This PC folders |
-
-Folders that carry their own custom icon (for example a folder an app styled itself, or one with its own `desktop.ini`) still
-show that icon; Windows always prefers the most specific setting. File-type icons, taskbar app icons and Start tiles are not touched.
-
-## What it changes
-
-All changes are per-user (`HKCU`) except the generic folder icon, machine drive icons and the lock screen fallback.
-
-| Area | Setting |
-|---|---|
-| Theme | `AppsUseLightTheme`, `SystemUsesLightTheme`, `EnableTransparency=1`, `ColorPrevalence=0` |
-| Accent | DWM `AccentColor`, `AccentColorMenu`, `StartColorMenu` (macOS blue) |
-| Taskbar position | `StuckRects3` / `MMStuckRects3` edge byte = top (1) or bottom (3) |
-| Taskbar auto-hide | Bit 0 of byte 8 in the same `Settings` value |
-| Taskbar icon size | `TaskbarSmallIcons` |
-| Taskbar tidy-up | `TaskbarGlomLevel=0`, `ShowTaskViewButton=0`, `ShowCortanaButton=0`, `SearchboxTaskbarMode=1`, `ShellFeedsTaskbarViewMode=2`, `PeopleBand=0` |
-| Selection glass | `ListviewAlphaSelect=1`, `ListviewShadow=1`, `TaskbarAnimations=1` |
-| Shell icons | `HKCU\Software\Classes\CLSID\{GUID}\DefaultIcon` and `HKCU\...\Explorer\CLSID\{GUID}\DefaultIcon`; class-level `Folder`, `Directory`, `Drive`, `CompressedFolder` |
-| Drive icons | `HKCU\Software\Classes\Applications\Explorer.exe\Drives\<letter>\DefaultIcon` (and `HKLM\...\Explorer\DriveIcons\<letter>` with admin) |
-| Profile folder icons | `IconResource=` line in each folder's `desktop.ini` (original content and attributes are backed up) |
-| Generic folder icon (admin) | `HKLM\...\Explorer\Shell Icons` values `3` (closed) and `4` (open); removed again by Restore |
-| Wallpaper | `IDesktopWallpaper` COM call, `Control Panel\Desktop` Wallpaper, `WallpaperStyle=10`, `TileWallpaper=0`, `Explorer\Wallpapers\BackgroundType=0` |
-| Lock screen | Per-user WinRT API `LockScreen.SetImageFileAsync` (no admin). Fallback only if that fails: `PersonalizationCSP` and the `LockScreenImage` policy (admin) |
-
-Generated files and the backups live in `C:\ProgramData\Modern10\`:
-
-```
-backup.json  icons-backup.json  modern10.log
-wallpaper-<theme>-<style>-<timestamp>.png
-lockscreen-<theme>-<timestamp>.png
-icons-<theme>-<icontheme>\*.ico
-```
-
-## Dock-style taskbar
-
-Windows 10 has no real dock, but you can get close:
-
-- **Built in, nothing extra:** open **Dock options...** and press *Use the dock-style preset* (bottom, default icons, auto-hide), then **Apply**. Auto-hide is just a flag in the taskbar's registry setting.
-- **Optional add-ons** (open *Dock options...*; nothing is installed unless you tick it and press **Install selected**):
-
-| App | Purpose | Source |
-|---|---|---|
-| [KiraDock](https://apps.microsoft.com/detail/9NPD1H35D0WD) | A macOS-style dock: a floating, animated launcher bar for your favourite apps | Microsoft Store (installed with winget; the store page opens if winget is unavailable) |
-| [TaskbarX](https://github.com/ChrisAnd1998/TaskbarX/releases) | Centres the taskbar icons and animates them for a floating-dock look on the normal taskbar; keeps running in the background | GitHub releases (winget, or the releases page opens) |
-
-Modern 10 works fully without them. Uninstall them later from *Settings > Apps*.
-
-## Limitations (Windows 10 is Windows 10)
-
-- **Icon size:** Windows 10 natively supports only small (16px) and default (32px) taskbar icons.
-- **Floating dock:** not possible without third-party software on Windows 10 - see the optional add-ons above.
-- **Blur:** Windows 10 only provides its built-in translucent/acrylic effects.
-- **Rounded windows and macOS fonts:** not available without extra software, so they are intentionally left alone.
-- **Restoring the lock screen:** Windows does not expose your previous lock screen picture, so *Restore original* cannot put it back. Choose it again in *Settings > Personalization > Lock screen*.
-- File-type icons (`.txt`, `.pdf`, ...), taskbar app icons and Start tiles come from the apps themselves and are not changed (ZIP archives are the one exception).
+- Restarting Explorer closes open File Explorer windows. Save your work first.
+- Folders with their own custom icon keep it. File-type icons, taskbar app icons and Start tiles are not changed.
+- *Restore original* cannot bring back your old lock screen picture. Choose it again in *Settings > Personalization > Lock screen*.
+- Windows 10 has no real dock, blur or rounded windows without extra software.
+- A work PC can block wallpaper, lock screen or icon changes through policy.
 
 ## Troubleshooting
 
-**Read the log first.** The window shows each step, and `C:\ProgramData\Modern10\modern10.log` keeps the full text.
+Read the log in the window. The full text is saved in `C:\ProgramData\Modern10\modern10.log`.
 
-**Icons did not change**
-Leave *Restart Explorer* ticked, or sign out and in. The generic folder icon only changes if you accept the UAC prompt.
-Make sure *System, drive, folder-type icons* is ticked (the folder and generic options depend on it). If the `.ico` files in
-`C:\ProgramData\Modern10\` were deleted, press **Restore original** and then **Apply** again. A work PC can lock icon
-settings through policy.
+- **Icons did not change:** keep *Restart Explorer* ticked, or sign out and back in.
+- **Wallpaper did not change:** check the `Wallpaper check` line in the log. It says if a policy is forcing the wallpaper.
+- **Taskbar did not move:** sign out and back in.
+- **Window does not open:** unblock the ZIP (step 1) and extract it again.
 
-**Wallpaper did not change**
-Read the `Wallpaper check` line in the log: it shows what Windows reports after the change. A message about a policy means an organisation setting is forcing the wallpaper.
+## Safety
 
-**Taskbar did not move / resize**
-The engine stops Explorer, writes the layout while no shell is running, restarts Explorer and measures the live taskbar (up to 3 attempts).
-If the summary says *Saved, but live taskbar is ...*, sign out and back in. A taskbar managed by a work policy cannot be moved.
+- The scripts are plain text, so you can read them first.
+- No network connections, no services, no startup entries.
+- Backups and generated files live in `C:\ProgramData\Modern10\`.
+- Only `Modern10.Elevated.ps1` runs as administrator, and it accepts a few fixed actions.
+- To uninstall, press **Restore original** and delete the folder.
 
-**Lock screen did not change**
-Press **Win+L** to check. The summary tells you which method worked. If the machine-level method was used, set *Background* to
-**Picture** (not *Windows Spotlight*) in *Settings > Personalization > Lock screen*. Organisation policy can override both.
-
-**The window does not open**
-Right-click the ZIP > Properties > **Unblock** and extract again. If Windows shows an error dialog, it contains the reason.
-
-## Uninstall
-
-Nothing is installed. Press **Restore original**, then delete the folder (and optionally `C:\ProgramData\Modern10\`).
-
-## Safety notes
-
-- The scripts are plain text. Read them before you run them.
-- Consider creating a System Restore point before first use.
-- It makes no network connections.
-- Restarting Explorer closes open File Explorer windows; save your work first.
-- The only code that runs as administrator is `Modern10.Elevated.ps1`. It accepts five fixed actions, no free-form paths, and only touches files inside `C:\ProgramData\Modern10`.
-
-## Project layout
+## Files
 
 ```
-Modern10/
-|-- Modern10.cmd           Double-click to open the window
-|-- Modern10.GUI.ps1       The window (Windows Forms)
-|-- Modern10.Engine.ps1    All the work: theme, taskbar, icons, wallpaper, lock screen, restore
-|-- Modern10.Icons.ps1     Icon drawing library (also used for the preview)
-|-- Modern10.Elevated.ps1  Tiny admin helper (only runs after a UAC prompt)
-|-- LICENSE
-`-- README.md
+Modern10.cmd           Opens the window
+Modern10.GUI.ps1       The window
+Modern10.Engine.ps1    Theme, taskbar, icons, wallpaper, lock screen, restore
+Modern10.Icons.ps1     Icon drawing
+Modern10.Elevated.ps1  Small admin helper
 ```
 
-## License
+---
 
-MIT - see `LICENSE`. Copyright (c) 2026 Tasmon Islam.
+MIT License. Developed by **Tasmon Islam** - tasmon@outlook.com
