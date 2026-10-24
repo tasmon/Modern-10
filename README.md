@@ -2,7 +2,7 @@
 
 **A dark and light, glassy, macOS-inspired look for Windows 10 - one window, nothing to install.**
 
-Developed by **Tasmon Islam**.
+Developed by **Tasmon Islam** - tasmon@outlook.com
 
 Modern 10 only changes **built-in Windows settings**. It draws its own wallpaper, lock screen and
 **icons** locally (several wallpaper styles and icon themes to choose from), puts the taskbar at the **top or bottom**, sets the **taskbar icon size** and can
@@ -10,14 +10,6 @@ Modern 10 only changes **built-in Windows settings**. It draws its own wallpaper
 everything back.
 
 > No themes to patch, no DLL injection, no startup apps, no services, no downloads.
-
----
-
-<img width="1910" height="1075" alt="image" src="https://github.com/user-attachments/assets/c1acb375-49fc-449b-a269-865febe6ad5f" />
-
----
-
-<img width="1919" height="1076" alt="image" src="https://github.com/user-attachments/assets/60da94e6-00cb-4894-9891-344478d8a1a2" />
 
 ---
 
@@ -37,14 +29,14 @@ everything back.
 | Taskbar position | **Top** (menu-bar style) or **Bottom** (Windows default) |
 | Taskbar icon size | **Small** (16px), **Default** (32px) or **Keep** your current size |
 | Taskbar behaviour | **Keep**, **Always show** or **Auto-hide** |
-| Wallpaper | Choose **Aurora, Waves, Sunset, Ocean, Emerald, Graphite** (each in a dark and a light version, drawn at your screen resolution, no downloads) or **your own image**. A live preview shows the choice |
-| Lock screen | Uses the same style, mirrored so it differs from the wallpaper |
-| Icon theme | **Glass** (blue), **Graphite**, **Sunset**, **Emerald** or **Violet**, each in a dark and a light version, with a live preview |
+| Wallpaper | Choose **Aurora, Waves, Sunset, Ocean, Emerald, Graphite, Nebula, Rose, Midnight, Citrus, Arctic, Dunes, Lagoon** (13 styles, each in a dark and a light version, drawn at your screen resolution, no downloads) or **your own image**. A live preview shows the choice |
+| Lock screen style | **Same as wallpaper** or any of the 13 styles on its own |
+| Icon theme | 11 packs - **Glass** (blue), **Graphite**, **Sunset**, **Emerald**, **Violet**, **Rose**, **Amber**, **Ocean**, **Crimson**, **Mint**, **Midnight** - each in a dark and a light version, with a live preview |
 | System, drive, folder-type icons | This PC, User, Network, Control Panel, Quick access, Libraries, OneDrive, Recycle Bin (empty/full), **every folder, every drive and ZIP archives** |
 | This PC folder icons | 3D Objects, Desktop, Documents, Downloads, Music, Pictures, Videos |
 | Profile folder icons | The same folders when you browse inside your user profile (`desktop.ini`) |
 | All users too | Also writes the generic folder icon and drive icons machine-wide (one UAC prompt) |
-| Dock options | A dock-style preset and a short list of open-source dock/taskbar add-ons |
+| Dock options | A dock-style preset (no extra software) plus two **optional** add-ons, KiraDock and TaskbarX, that are installed only if you tick them and press *Install selected* |
 | Icon preview | Shows the icons that will be drawn for the selected theme |
 
 The log under the buttons shows each step. A summary at the end lists what worked, and the same text is written to
@@ -128,21 +120,19 @@ icons-<theme>-<icontheme>\*.ico
 Windows 10 has no real dock, but you can get close:
 
 - **Built in, nothing extra:** open **Dock options...** and press *Use the dock-style preset* (bottom, default icons, auto-hide), then **Apply**. Auto-hide is just a flag in the taskbar's registry setting.
-- **Open-source add-ons** (separate downloads; Modern 10 does not install them):
+- **Optional add-ons** (open *Dock options...*; nothing is installed unless you tick it and press **Install selected**):
 
-| Tool | What it gives you | Notes |
+| App | Purpose | Source |
 |---|---|---|
-| [Seelen UI](https://github.com/eythaann/Seelen-UI) | macOS-style dock and toolbar replacing the taskbar | AGPL-3.0, Windows 10 and 11, heaviest option |
-| [Windhawk](https://windhawk.net) | Small mod platform; browse its catalog for taskbar mods | Windows 10 is the minimum supported version |
-| [TranslucentTB](https://github.com/TranslucentTB/TranslucentTB) | Clear or blurred taskbar | GPL-3.0, Windows 10 and 11 |
-| [SmartTaskbar](https://github.com/Oliviaophia/SmartTaskbar) | Hides the taskbar when a window is maximised | MIT, tiny |
+| [KiraDock](https://apps.microsoft.com/detail/9NPD1H35D0WD) | A macOS-style dock: a floating, animated launcher bar for your favourite apps | Microsoft Store (installed with winget; the store page opens if winget is unavailable) |
+| [TaskbarX](https://github.com/ChrisAnd1998/TaskbarX/releases) | Centres the taskbar icons and animates them for a floating-dock look on the normal taskbar; keeps running in the background | GitHub releases (winget, or the releases page opens) |
 
-For the closest "floating dock" look, Seelen UI is the all-in-one choice; the built-in preset above is the lightest.
+Modern 10 works fully without them. Uninstall them later from *Settings > Apps*.
 
 ## Limitations (Windows 10 is Windows 10)
 
 - **Icon size:** Windows 10 natively supports only small (16px) and default (32px) taskbar icons.
-- **Floating dock:** not possible without third-party software on Windows 10 - see the table above.
+- **Floating dock:** not possible without third-party software on Windows 10 - see the optional add-ons above.
 - **Blur:** Windows 10 only provides its built-in translucent/acrylic effects.
 - **Rounded windows and macOS fonts:** not available without extra software, so they are intentionally left alone.
 - **Restoring the lock screen:** Windows does not expose your previous lock screen picture, so *Restore original* cannot put it back. Choose it again in *Settings > Personalization > Lock screen*.

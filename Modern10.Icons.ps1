@@ -11,7 +11,7 @@ $script:M10IconKinds = @(
     'Archive', 'QuickAccess', 'Libraries', 'OneDrive'
 )
 
-$script:M10IconThemes = @('Glass', 'Graphite', 'Sunset', 'Emerald', 'Violet')
+$script:M10IconThemes = @('Glass', 'Graphite', 'Sunset', 'Emerald', 'Violet', 'Rose', 'Amber', 'Ocean', 'Crimson', 'Mint', 'Midnight')
 function Get-M10IconThemeNames { return $script:M10IconThemes }
 
 function New-M10Col([string]$Hex, [int]$A = 255) {
@@ -37,6 +37,12 @@ function Get-M10IconThemeOverride([string]$Theme, [string]$IconTheme) {
             'Sunset'   { return @{ FB1 = (& $c '#FF9A62'); FB2 = (& $c '#F27A3D'); FF1 = (& $c '#FFD0A8'); FF2 = (& $c '#FFA66B'); S1 = (& $c '#FFB36B'); S2 = (& $c '#FF9CC4'); A1 = (& $c '#FFC08A'); A2 = (& $c '#FF7A4D') } }
             'Emerald'  { return @{ FB1 = (& $c '#4CC9A0'); FB2 = (& $c '#2FA97F'); FF1 = (& $c '#A8EBD0'); FF2 = (& $c '#5FD3A6'); S1 = (& $c '#9BE8CF'); S2 = (& $c '#6FD6C0'); A1 = (& $c '#8FE6C4'); A2 = (& $c '#27B07F') } }
             'Violet'   { return @{ FB1 = (& $c '#9B78F0'); FB2 = (& $c '#7A55DC'); FF1 = (& $c '#D4BEFF'); FF2 = (& $c '#A987F5'); S1 = (& $c '#C9B0FF'); S2 = (& $c '#9CB0FF'); A1 = (& $c '#C7A6FF'); A2 = (& $c '#8A5CF0') } }
+            'Rose'     { return @{ FB1 = (& $c '#F27AA5'); FB2 = (& $c '#DC5A8A'); FF1 = (& $c '#FFC9DD'); FF2 = (& $c '#FF93B8'); S1 = (& $c '#FFB3D1'); S2 = (& $c '#D6A8FF'); A1 = (& $c '#FFA6C6'); A2 = (& $c '#F0508A') } }
+            'Amber'    { return @{ FB1 = (& $c '#F5B83D'); FB2 = (& $c '#E09A1A'); FF1 = (& $c '#FFE29A'); FF2 = (& $c '#FFC94D'); S1 = (& $c '#FFD36B'); S2 = (& $c '#FFA94D'); A1 = (& $c '#FFD36B'); A2 = (& $c '#F59E0B') } }
+            'Ocean'    { return @{ FB1 = (& $c '#4FC3E8'); FB2 = (& $c '#2AA3D0'); FF1 = (& $c '#B5ECFF'); FF2 = (& $c '#66D0F0'); S1 = (& $c '#8FE0FF'); S2 = (& $c '#7FA8FF'); A1 = (& $c '#7FDCFF'); A2 = (& $c '#0AA5D6') } }
+            'Crimson'  { return @{ FB1 = (& $c '#F0626B'); FB2 = (& $c '#D84450'); FF1 = (& $c '#FFC2C6'); FF2 = (& $c '#FF8A92'); S1 = (& $c '#FFA3A9'); S2 = (& $c '#FFC499'); A1 = (& $c '#FF9AA1'); A2 = (& $c '#E5384A') } }
+            'Mint'     { return @{ FB1 = (& $c '#7ADBC0'); FB2 = (& $c '#4FC2A4'); FF1 = (& $c '#CFF7EA'); FF2 = (& $c '#9AEAD2'); S1 = (& $c '#BDF3E3'); S2 = (& $c '#A8D8FF'); A1 = (& $c '#A5EFD8'); A2 = (& $c '#2FBF98') } }
+            'Midnight' { return @{ FB1 = (& $c '#6C7AA8'); FB2 = (& $c '#515F8C'); FF1 = (& $c '#C9D2EE'); FF2 = (& $c '#93A2D0'); S1 = (& $c '#B5C0E6'); S2 = (& $c '#8E9AD6'); A1 = (& $c '#A8B6E8'); A2 = (& $c '#4A5BA8') } }
         }
     } else {
         switch ($IconTheme) {
@@ -44,6 +50,12 @@ function Get-M10IconThemeOverride([string]$Theme, [string]$IconTheme) {
             'Sunset'   { return @{ FB1 = (& $c '#D9602F'); FB2 = (& $c '#B8431F'); FF1 = (& $c '#FFA15C'); FF2 = (& $c '#FF6B3D'); S1 = (& $c '#FF2D95'); S2 = (& $c '#FF8A3D'); A1 = (& $c '#FFB36B'); A2 = (& $c '#FF5A3D') } }
             'Emerald'  { return @{ FB1 = (& $c '#1E8F6A'); FB2 = (& $c '#146B50'); FF1 = (& $c '#58D6A6'); FF2 = (& $c '#27B07F'); S1 = (& $c '#2DD4A8'); S2 = (& $c '#0E8F73'); A1 = (& $c '#5FE0B5'); A2 = (& $c '#17A37A') } }
             'Violet'   { return @{ FB1 = (& $c '#6A3FD0'); FB2 = (& $c '#4D2AA8'); FF1 = (& $c '#B28CFF'); FF2 = (& $c '#8A5CF0'); S1 = (& $c '#B07CFF'); S2 = (& $c '#5E5CE6'); A1 = (& $c '#B28CFF'); A2 = (& $c '#7D3CFF') } }
+            'Rose'     { return @{ FB1 = (& $c '#C2487A'); FB2 = (& $c '#962F5E'); FF1 = (& $c '#FF8FB8'); FF2 = (& $c '#E8548F'); S1 = (& $c '#FF5FA0'); S2 = (& $c '#A855F7'); A1 = (& $c '#FF8FB8'); A2 = (& $c '#F0508A') } }
+            'Amber'    { return @{ FB1 = (& $c '#C98A12'); FB2 = (& $c '#9A6208'); FF1 = (& $c '#FFC94D'); FF2 = (& $c '#F5A623'); S1 = (& $c '#FFB020'); S2 = (& $c '#E5701A'); A1 = (& $c '#FFD36B'); A2 = (& $c '#F59E0B') } }
+            'Ocean'    { return @{ FB1 = (& $c '#17829F'); FB2 = (& $c '#0F6180'); FF1 = (& $c '#4FD0F0'); FF2 = (& $c '#1AA8D2'); S1 = (& $c '#22C4E8'); S2 = (& $c '#2F6FE0'); A1 = (& $c '#5FD8F5'); A2 = (& $c '#0AA5D6') } }
+            'Crimson'  { return @{ FB1 = (& $c '#B02A38'); FB2 = (& $c '#84202B'); FF1 = (& $c '#FF7A85'); FF2 = (& $c '#E5384A'); S1 = (& $c '#FF4D5E'); S2 = (& $c '#C2255C'); A1 = (& $c '#FF7A85'); A2 = (& $c '#E5384A') } }
+            'Mint'     { return @{ FB1 = (& $c '#2F9C84'); FB2 = (& $c '#207A66'); FF1 = (& $c '#8FF0D4'); FF2 = (& $c '#4CD1B0'); S1 = (& $c '#5FE8C8'); S2 = (& $c '#3BA0E0'); A1 = (& $c '#8FF0D4'); A2 = (& $c '#2FBF98') } }
+            'Midnight' { return @{ FB1 = (& $c '#26305A'); FB2 = (& $c '#1A2142'); FF1 = (& $c '#6C7DBE'); FF2 = (& $c '#46568F'); S1 = (& $c '#3B4A8F'); S2 = (& $c '#1B2450'); A1 = (& $c '#8C9EE0'); A2 = (& $c '#4A5BC8') } }
         }
     }
     return @{}

@@ -184,7 +184,9 @@ $lblDevCap = New-Label 'DEVELOPED BY' 556 16 200 14 $fontSmall 'sub'
 $lblDevCap.TextAlign = 'MiddleRight'
 $lblDev = New-Label $script:M10Developer 556 30 200 24 $fontDev 'text'
 $lblDev.TextAlign = 'MiddleRight'
-$lblVer = New-Label ('Version ' + $script:M10Version) 556 54 200 18 $script:FontBody 'sub'
+$lblMail = New-Label 'tasmon@outlook.com' 556 54 200 18 $script:FontBody 'sub'
+$lblMail.TextAlign = 'MiddleRight'
+$lblVer = New-Label ('Version ' + $script:M10Version) 556 72 200 18 $script:FontBody 'sub'
 $lblVer.TextAlign = 'MiddleRight'
 
 [void](New-Label 'THEME' 24 94 170 16 $fontSmall 'sub')
@@ -224,6 +226,7 @@ $chkSys.Add_CheckedChanged({
     $chkGeneric.Enabled = $chkSys.Checked
     $cmbIcon.Enabled    = $chkSys.Checked
 })
+$chkLock.Add_CheckedChanged({ $cmbLock.Enabled = $chkLock.Checked })
 $chkWall.Add_CheckedChanged({
     $cmbWall.Enabled = $chkWall.Checked
     $btnBrowse.Enabled = $chkWall.Checked
@@ -244,9 +247,11 @@ $wallItems = @(Get-M10WallpaperStyleNames) + @('Custom image...')
 $cmbWall = New-Combo $wallItems 270 260 250
 $btnBrowse = New-Button 'Browse for your own image...' 270 292 250 30 $false
 $pbWall = New-Object System.Windows.Forms.PictureBox
-$pbWall.Location = New-Pt 270 330; $pbWall.Size = New-Sz 250 141; $pbWall.SizeMode = 'Zoom'
+$pbWall.Location = New-Pt 270 326; $pbWall.Size = New-Sz 170 96; $pbWall.SizeMode = 'Zoom'
 $pbWall.BorderStyle = 'FixedSingle'
 $form.Controls.Add($pbWall)
+[void](New-Label 'LOCK SCREEN STYLE' 270 428 250 16 $fontSmall 'sub')
+$cmbLock = New-Combo (@('Same as wallpaper') + @(Get-M10WallpaperStyleNames)) 270 446 250
 
 $cmbIcon = New-Combo @(Get-M10IconThemeNames) 540 260 216
 $previewKinds = @('Folder', 'Documents', 'Downloads', 'Objects3D', 'Archive', 'ThisPC', 'Drive', 'RecycleFull', 'User', 'QuickAccess', 'Libraries', 'OneDrive')
@@ -405,6 +410,7 @@ function Set-Busy([bool]$Busy) {
     $cmbWall.Enabled = ((-not $Busy) -and $chkWall.Checked)
     $btnBrowse.Enabled = ((-not $Busy) -and $chkWall.Checked)
     $cmbIcon.Enabled = ((-not $Busy) -and $chkSys.Checked)
+    $cmbLock.Enabled = ((-not $Busy) -and $chkLock.Checked)
     $progress.Visible = $Busy
     foreach ($p in $segTheme, $segPos, $segSize, $segBeh) { $p.Enabled = -not $Busy }
 }
@@ -481,6 +487,7 @@ function Get-GuiOptions {
     $o.Wallpaper       = $chkWall.Checked
     $o.WallpaperStyle  = Get-WallStyle
     $o.CustomWallpaper = $script:CustomPath
+    $o.LockStyle       = $(if ($cmbLock.SelectedIndex -le 0) { 'Match' } else { [string]$cmbLock.SelectedItem })
     $o.IconTheme       = [string]$cmbIcon.SelectedItem
     $o.LockScreen      = $chkLock.Checked
     $o.RestartExplorer = $chkRestart.Checked
@@ -498,7 +505,7 @@ function Show-DockWindow {
     $dlg.Text = 'Dock options - Modern 10'
     $dlg.AutoScaleDimensions = New-Object System.Drawing.SizeF(96, 96)
     $dlg.AutoScaleMode = 'Dpi'
-    $dlg.ClientSize = New-Sz 640 540
+    $dlg.ClientSize = New-Sz 640 470
     $dlg.StartPosition = 'CenterParent'
     $dlg.FormBorderStyle = 'FixedDialog'
     $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false
@@ -524,32 +531,66 @@ function Show-DockWindow {
     $dlg.Controls.Add($bp)
 
     $h = New-Object System.Windows.Forms.Label
-    $h.Text = 'OPEN-SOURCE ADD-ONS (separate downloads, not installed by Modern 10)'
+    $h.Text = 'OPTIONAL ADD-ONS (nothing is installed unless you tick it and press Install)'
     $h.Font = $fontSmall; $h.ForeColor = $p.Sub; $h.Location = New-Pt 20 156; $h.Size = New-Sz 600 16
     $dlg.Controls.Add($h)
 
     $items = @(
-        @('Seelen UI', 'AGPL-3.0. A macOS-style dock and toolbar that replace the taskbar. Windows 10 and 11. The heaviest option here, but the closest to a real dock.', 'https://github.com/eythaann/Seelen-UI'),
-        @('Windhawk', 'A small mod platform for Windows. Windows 10 is the minimum supported version. Browse its catalog for taskbar mods.', 'https://windhawk.net'),
-        @('TranslucentTB', 'GPL-3.0. Makes the taskbar clear or blurred. Supports Windows 10 and 11; the blur mode works on Windows 10.', 'https://github.com/TranslucentTB/TranslucentTB'),
-        @('SmartTaskbar', 'MIT. Hides the taskbar automatically when a window is maximised and shows it otherwise. Tiny.', 'https://github.com/Oliviaophia/SmartTaskbar')
+        @{ Name = 'KiraDock'; Id = '9NPD1H35D0WD'; Source = 'msstore'
+           Url = 'https://apps.microsoft.com/detail/9NPD1H35D0WD'
+           Info = 'Purpose: a macOS-style dock for Windows - a floating, animated launcher bar for your favourite apps at the edge of the screen. Free app from the Microsoft Store.' },
+        @{ Name = 'TaskbarX'; Id = 'ChrisAndriessen.TaskbarX'; Source = 'winget'
+           Url = 'https://github.com/ChrisAnd1998/TaskbarX/releases'
+           Info = 'Purpose: centres the taskbar icons and animates them, for a floating-dock look on the normal taskbar. A small open-source app from GitHub that keeps running in the background.' }
     )
-    $y = 180
+    $y = 182
     foreach ($it in $items) {
-        $n = New-Object System.Windows.Forms.Label
-        $n.Text = $it[0]; $n.Font = $script:FontBold; $n.Location = New-Pt 20 $y; $n.Size = New-Sz 600 18
-        $dlg.Controls.Add($n)
+        $c = New-Object System.Windows.Forms.CheckBox
+        $c.Text = $it.Name; $c.Font = $script:FontBold; $c.AutoSize = $true; $c.Cursor = 'Hand'
+        $c.Location = New-Pt 20 $y; $c.Tag = $it
+        $c.ForeColor = $p.Text; $c.BackColor = $p.Back
+        $dlg.Controls.Add($c)
         $s = New-Object System.Windows.Forms.Label
-        $s.Text = $it[1]; $s.ForeColor = $p.Sub; $s.Location = New-Pt 20 ($y + 18); $s.Size = New-Sz 600 34
+        $s.Text = $it.Info; $s.ForeColor = $p.Sub; $s.Location = New-Pt 40 ($y + 26); $s.Size = New-Sz 580 50
         $dlg.Controls.Add($s)
         $lk = New-Object System.Windows.Forms.LinkLabel
-        $lk.Text = $it[2]; $lk.Location = New-Pt 20 ($y + 52); $lk.Size = New-Sz 600 18
+        $lk.Text = $it.Url; $lk.Location = New-Pt 40 ($y + 78); $lk.Size = New-Sz 580 18
         $lk.LinkColor = $p.Accent; $lk.ActiveLinkColor = $p.Accent
-        $lk.Tag = $it[2]
+        $lk.Tag = $it.Url
         $lk.Add_LinkClicked({ param($s2, $e2) Start-Process ([string]$s2.Tag) })
         $dlg.Controls.Add($lk)
-        $y += 82
+        $y += 112
     }
+
+    $bi = New-Object System.Windows.Forms.Button
+    $bi.Text = 'Install selected'; $bi.FlatStyle = 'Flat'; $bi.Font = $script:FontBold
+    $bi.Location = New-Pt 20 412; $bi.Size = New-Sz 180 36
+    $bi.BackColor = $p.Panel; $bi.ForeColor = $p.Text; $bi.FlatAppearance.BorderColor = $p.Border
+    $bi.Add_Click({
+        $form2 = $this.FindForm()
+        $sel = @()
+        foreach ($ctl in $form2.Controls) { if (($ctl -is [System.Windows.Forms.CheckBox]) -and $ctl.Checked) { $sel += $ctl.Tag } }
+        if ($sel.Count -eq 0) {
+            [System.Windows.Forms.MessageBox]::Show('Tick KiraDock and/or TaskbarX first. Nothing is installed otherwise.', 'Modern 10', 'OK', 'Information') | Out-Null
+            return
+        }
+        $names = ($sel | ForEach-Object { $_.Name }) -join ' and '
+        $r = [System.Windows.Forms.MessageBox]::Show(("Install {0}?`n`nA setup window opens (it uses winget). If winget is missing or fails, the download page opens instead." -f $names), 'Modern 10', 'YesNo', 'Question')
+        if ($r -ne 'Yes') { return }
+        foreach ($it2 in $sel) {
+            $src = ''
+            if ($it2.Source -eq 'msstore') { $src = ' --source msstore' }
+            $cmd = "Write-Host 'Installing $($it2.Name)...'; winget install --id $($it2.Id) -e$src --accept-package-agreements --accept-source-agreements; if (`$LASTEXITCODE -ne 0) { Write-Host 'Could not install with winget. Opening the download page instead...'; Start-Process '$($it2.Url)' }; Read-Host 'Press Enter to close this window'"
+            try { Start-Process -FilePath 'powershell.exe' -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', ('"' + $cmd + '"')) }
+            catch { Start-Process $it2.Url }
+        }
+    })
+    $dlg.Controls.Add($bi)
+
+    $note = New-Object System.Windows.Forms.Label
+    $note.Text = 'Optional. Modern 10 works without them. Uninstall them later from Settings > Apps.'
+    $note.ForeColor = $p.Sub; $note.Location = New-Pt 212 421; $note.Size = New-Sz 410 20
+    $dlg.Controls.Add($note)
     $dlg.Add_Shown({
         $v = 0; if ($script:Pal.Back.R -lt 100) { $v = 1 }
         [void][M10Gui]::DwmSetWindowAttribute($this.Handle, 20, [ref]$v, 4)

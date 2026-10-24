@@ -813,7 +813,7 @@ function Add-M10Glow($G, [single]$Cx, [single]$Cy, [single]$R, $Color) {
 }
 
 # name -> definition. Glows: colour, x, y, radius (fractions of the width), alpha. Waves: y, amplitude, phase, c1, a1, c2, a2.
-$script:M10WallpaperStyles = @('Aurora', 'Waves', 'Sunset', 'Ocean', 'Emerald', 'Graphite')
+$script:M10WallpaperStyles = @('Aurora', 'Waves', 'Sunset', 'Ocean', 'Emerald', 'Graphite', 'Nebula', 'Rose', 'Midnight', 'Citrus', 'Arctic', 'Dunes', 'Lagoon')
 function Get-M10WallpaperStyleNames { return $script:M10WallpaperStyles }
 
 function Get-M10WallpaperStyleDef([string]$Style, [string]$Mode) {
@@ -850,6 +850,48 @@ function Get-M10WallpaperStyleDef([string]$Style, [string]$Mode) {
                 Glows = @(@('#3A4A6B', 0.25, 0.30, 0.50, 170), @('#5A5F70', 0.80, 0.70, 0.50, 120), @('#2B3350', 0.60, 0.10, 0.35, 140), @('#0A0B0D', 0.03, 0.99, 0.50, 230)) } }
             return @{ Bg = @('#F2F3F5', '#E6E8EC'); Grain = 2; Edge = 0; Waves = @()
                 Glows = @(@('#B8C2D8', 0.25, 0.30, 0.50, 190), @('#D5D9E2', 0.80, 0.70, 0.50, 170), @('#C9CFDB', 0.60, 0.10, 0.35, 150), @('#FFFFFF', 0.40, 0.60, 0.40, 140)) }
+        }
+        'Nebula' {
+            if ($dk) { return @{ Bg = @('#0B0620', '#1E0A33'); Grain = 3; Edge = 0; Waves = @()
+                Glows = @(@('#B03CFF', 0.25, 0.3, 0.5, 200), @('#FF3CA8', 0.75, 0.2, 0.38, 170), @('#3C5CFF', 0.6, 0.85, 0.5, 190), @('#0A0418', 0.03, 0.98, 0.45, 230)) } }
+            return @{ Bg = @('#F4EAFF', '#FFE9F6'); Grain = 2; Edge = 0; Waves = @()
+                Glows = @(@('#D1A3FF', 0.25, 0.3, 0.5, 200), @('#FFA3D1', 0.75, 0.2, 0.38, 190), @('#A3B8FF', 0.6, 0.85, 0.5, 190), @('#FFFFFF', 0.4, 0.55, 0.4, 130)) }
+        }
+        'Rose' {
+            if ($dk) { return @{ Bg = @('#1F0B16', '#2E1022'); Grain = 3; Edge = 0; Waves = @()
+                Glows = @(@('#FF5FA0', 0.22, 0.3, 0.5, 170), @('#C23C7A', 0.8, 0.8, 0.5, 190), @('#FFA3C4', 0.6, 0.05, 0.3, 100), @('#0F0509', 0.03, 0.99, 0.45, 230)) } }
+            return @{ Bg = @('#FFEFF4', '#FFE3EC'); Grain = 2; Edge = 0; Waves = @()
+                Glows = @(@('#FFB3CF', 0.22, 0.3, 0.5, 200), @('#FFC9DC', 0.8, 0.8, 0.5, 200), @('#FFD9E6', 0.6, 0.05, 0.3, 170), @('#FFFFFF', 0.4, 0.55, 0.4, 130)) }
+        }
+        'Midnight' {
+            if ($dk) { return @{ Bg = @('#05070F', '#0B1226'); Grain = 3; Edge = 0; Waves = @()
+                Glows = @(@('#1F3A8A', 0.25, 0.3, 0.5, 190), @('#0E7490', 0.78, 0.75, 0.45, 150), @('#312E81', 0.55, 0.1, 0.35, 150), @('#02030A', 0.03, 0.99, 0.5, 235)) } }
+            return @{ Bg = @('#E9EDF8', '#DCE3F4'); Grain = 2; Edge = 0; Waves = @()
+                Glows = @(@('#A9B9E8', 0.25, 0.3, 0.5, 200), @('#A5D8E6', 0.78, 0.75, 0.45, 180), @('#C0BEF0', 0.55, 0.1, 0.35, 170), @('#FFFFFF', 0.4, 0.55, 0.4, 130)) }
+        }
+        'Citrus' {
+            if ($dk) { return @{ Bg = @('#101A06', '#1B2606'); Grain = 3; Edge = 0; Waves = @()
+                Glows = @(@('#A3E635', 0.25, 0.3, 0.5, 150), @('#FACC15', 0.8, 0.75, 0.45, 150), @('#22C55E', 0.6, 0.08, 0.3, 120), @('#060A02', 0.03, 0.99, 0.5, 230)) } }
+            return @{ Bg = @('#F7FFE6', '#FFFBE0'); Grain = 2; Edge = 0; Waves = @()
+                Glows = @(@('#D4F58A', 0.25, 0.3, 0.5, 200), @('#FFE98A', 0.8, 0.75, 0.45, 200), @('#B8F0A8', 0.6, 0.08, 0.3, 170), @('#FFFFFF', 0.4, 0.55, 0.4, 130)) }
+        }
+        'Arctic' {
+            if ($dk) { return @{ Bg = @('#0A1620', '#10222F'); Grain = 3; Edge = 0; Waves = @()
+                Glows = @(@('#7DD3FC', 0.25, 0.3, 0.5, 130), @('#A5F3FC', 0.78, 0.2, 0.35, 110), @('#38BDF8', 0.6, 0.85, 0.5, 140), @('#040B10', 0.03, 0.99, 0.5, 230)) } }
+            return @{ Bg = @('#F0FAFF', '#E4F3FB'); Grain = 2; Edge = 0; Waves = @()
+                Glows = @(@('#C2EBFF', 0.25, 0.3, 0.5, 200), @('#DDF8FF', 0.78, 0.2, 0.35, 190), @('#B3DDF5', 0.6, 0.85, 0.5, 190), @('#FFFFFF', 0.4, 0.55, 0.4, 140)) }
+        }
+        'Dunes' {
+            if ($dk) { return @{ Bg = @('#1A0F08', '#2B1A0E'); Grain = 3; Edge = 40; Waves = @(@(0.7, 0.06, 0.8, '#B45309', 90, '#3B1E0B', 40), @(0.84, 0.05, 2.6, '#92400E', 100, '#2A1608', 40))
+                Glows = @(@('#F59E0B', 0.25, 0.3, 0.5, 150), @('#C2410C', 0.8, 0.8, 0.5, 170), @('#FDBA74', 0.6, 0.05, 0.3, 100), @('#0A0502', 0.03, 0.99, 0.5, 230)) } }
+            return @{ Bg = @('#FFF4E5', '#FFE8D0'); Grain = 2; Edge = 160; Waves = @(@(0.7, 0.06, 0.8, '#FFE0B0', 150, '#FFD0A0', 60), @(0.84, 0.05, 2.6, '#FFC99A', 150, '#FFEAD0', 60))
+                Glows = @(@('#FFD099', 0.25, 0.3, 0.5, 200), @('#FFB98A', 0.8, 0.8, 0.5, 200), @('#FFE3B8', 0.6, 0.05, 0.3, 170), @('#FFFFFF', 0.4, 0.55, 0.4, 130)) }
+        }
+        'Lagoon' {
+            if ($dk) { return @{ Bg = @('#021A1A', '#06292F'); Grain = 3; Edge = 40; Waves = @(@(0.66, 0.06, 0.5, '#2DD4BF', 90, '#06403F', 40), @(0.8, 0.05, 2.3, '#38BDF8', 90, '#06324A', 40))
+                Glows = @(@('#14B8A6', 0.25, 0.3, 0.5, 170), @('#0EA5E9', 0.78, 0.2, 0.38, 150), @('#115E59', 0.6, 0.85, 0.5, 180), @('#010C0C', 0.03, 0.99, 0.5, 230)) } }
+            return @{ Bg = @('#E6FFFA', '#E3F6FF'); Grain = 2; Edge = 160; Waves = @(@(0.66, 0.06, 0.5, '#FFFFFF', 170, '#B6F2E6', 60), @(0.8, 0.05, 2.3, '#E0F7FF', 160, '#B8E4F8', 60))
+                Glows = @(@('#99F6E4', 0.25, 0.3, 0.5, 200), @('#BAE6FD', 0.78, 0.2, 0.38, 190), @('#A7F3D0', 0.6, 0.85, 0.5, 190), @('#FFFFFF', 0.4, 0.55, 0.4, 130)) }
         }
         default {
             # Aurora: deep navy and violet with a blue, a teal and a purple light
@@ -969,7 +1011,7 @@ function Set-M10Wallpaper([string]$Path) {
 function New-M10Options {
     return [ordered]@{
         Theme = 'Dark'; Position = 'Top'; IconSize = 'Small'; Behavior = 'Keep'
-        WallpaperStyle = 'Aurora'; CustomWallpaper = ''; IconTheme = 'Glass'
+        WallpaperStyle = 'Aurora'; LockStyle = 'Match'; CustomWallpaper = ''; IconTheme = 'Glass'
         Wallpaper = $true; LockScreen = $true; RestartExplorer = $true
         SystemIcons = $true; FolderIcons = $true; ProfileIcons = $true; GenericFolder = $true
     }
@@ -1061,17 +1103,20 @@ function Invoke-M10Apply($Opt) {
 
     if ($Opt.LockScreen) {
         Invoke-M10Stage 'Lock screen' {
-            Write-Step "Drawing lock screen ($W x $H)..."
+            Write-Step "Drawing the lock screen ($W x $H)..."
             $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
             $lockName = "lockscreen-$tag-$stamp.png"
             $lp = Join-Path $script:DataDir $lockName
-            if ($style -eq 'Custom' -and $Opt.CustomWallpaper -and (Test-Path -LiteralPath ([string]$Opt.CustomWallpaper))) {
+            $lockStyle = [string]$Opt.LockStyle
+            if (-not $lockStyle -or $lockStyle -eq 'Match') { $lockStyle = $style }
+            if ($lockStyle -eq 'Custom' -and $Opt.CustomWallpaper -and (Test-Path -LiteralPath ([string]$Opt.CustomWallpaper))) {
                 $bytes = [System.IO.File]::ReadAllBytes([string]$Opt.CustomWallpaper)
                 $ms = New-Object System.IO.MemoryStream(, $bytes)
                 $img = [System.Drawing.Image]::FromStream($ms)
                 try { $img.Save($lp, [System.Drawing.Imaging.ImageFormat]::Png) } finally { $img.Dispose(); $ms.Dispose() }
             } else {
-                New-M10GlassImage -Path $lp -W $W -H $H -Mode $Theme -Kind 'Lock' -Style $style
+                if ($lockStyle -eq 'Custom') { $lockStyle = 'Aurora' }
+                New-M10GlassImage -Path $lp -W $W -H $H -Mode $Theme -Kind 'Lock' -Style $lockStyle
             }
 
             if (Test-M10LockOverride) {
