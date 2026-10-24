@@ -1,3 +1,3 @@
 @echo off
-rem Double-click launcher: runs the interactive Modern 10 script (no install, no policy change).
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Modern10.ps1" %*
+rem Opens the Modern 10 window. Nothing is installed and no policy is changed.
+start "" powershell.exe -STA -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "%~dp0Modern10.GUI.ps1"

@@ -1,4 +1,4 @@
-# Modern10.Icons.ps1  -  dot-sourced by Modern10.ps1 and Modern10-GUI.ps1
+# Modern10.Icons.ps1  -  dot-sourced by Modern10.Engine.ps1 (and through it by the GUI)
 # Draws macOS-inspired glass icons with System.Drawing and writes multi-size .ico files.
 # Nothing is downloaded; everything is vector-drawn on a 256 x 256 canvas.
 
@@ -7,8 +7,12 @@ Add-Type -AssemblyName System.Drawing
 $script:M10IconKinds = @(
     'Folder', 'FolderOpen', 'ThisPC', 'Drive', 'RecycleEmpty', 'RecycleFull',
     'User', 'Network', 'ControlPanel',
-    'Documents', 'Downloads', 'Pictures', 'Music', 'Videos', 'Desktop'
+    'Documents', 'Downloads', 'Pictures', 'Music', 'Videos', 'Desktop', 'Objects3D',
+    'Archive', 'QuickAccess', 'Libraries', 'OneDrive'
 )
+
+$script:M10IconThemes = @('Glass', 'Graphite', 'Sunset', 'Emerald', 'Violet')
+function Get-M10IconThemeNames { return $script:M10IconThemes }
 
 function New-M10Col([string]$Hex, [int]$A = 255) {
     $h = $Hex.TrimStart('#')
@@ -18,7 +22,34 @@ function New-M10Col([string]$Hex, [int]$A = 255) {
         [Convert]::ToInt32($h.Substring(4, 2), 16))
 }
 
-function Get-M10Palette([string]$Theme) {
+function Get-M10Palette([string]$Theme, [string]$IconTheme = 'Glass') {
+    $p = Get-M10BasePalette $Theme
+    $o = Get-M10IconThemeOverride $Theme $IconTheme
+    foreach ($k in $o.Keys) { $p[$k] = $o[$k] }
+    return $p
+}
+
+function Get-M10IconThemeOverride([string]$Theme, [string]$IconTheme) {
+    $c = { param($h) New-M10Col $h }
+    if ($Theme -eq 'Light') {
+        switch ($IconTheme) {
+            'Graphite' { return @{ FB1 = (& $c '#9AA3B5'); FB2 = (& $c '#7C8596'); FF1 = (& $c '#D4D9E3'); FF2 = (& $c '#A9B1C2'); S1 = (& $c '#C9CFDB'); S2 = (& $c '#9AA3B5'); A1 = (& $c '#B7BFCD'); A2 = (& $c '#7C8596') } }
+            'Sunset'   { return @{ FB1 = (& $c '#FF9A62'); FB2 = (& $c '#F27A3D'); FF1 = (& $c '#FFD0A8'); FF2 = (& $c '#FFA66B'); S1 = (& $c '#FFB36B'); S2 = (& $c '#FF9CC4'); A1 = (& $c '#FFC08A'); A2 = (& $c '#FF7A4D') } }
+            'Emerald'  { return @{ FB1 = (& $c '#4CC9A0'); FB2 = (& $c '#2FA97F'); FF1 = (& $c '#A8EBD0'); FF2 = (& $c '#5FD3A6'); S1 = (& $c '#9BE8CF'); S2 = (& $c '#6FD6C0'); A1 = (& $c '#8FE6C4'); A2 = (& $c '#27B07F') } }
+            'Violet'   { return @{ FB1 = (& $c '#9B78F0'); FB2 = (& $c '#7A55DC'); FF1 = (& $c '#D4BEFF'); FF2 = (& $c '#A987F5'); S1 = (& $c '#C9B0FF'); S2 = (& $c '#9CB0FF'); A1 = (& $c '#C7A6FF'); A2 = (& $c '#8A5CF0') } }
+        }
+    } else {
+        switch ($IconTheme) {
+            'Graphite' { return @{ FB1 = (& $c '#5B6270'); FB2 = (& $c '#444A57'); FF1 = (& $c '#9AA3B5'); FF2 = (& $c '#6E7788'); S1 = (& $c '#6B7280'); S2 = (& $c '#3F4654'); A1 = (& $c '#9AA3B5'); A2 = (& $c '#5F6878') } }
+            'Sunset'   { return @{ FB1 = (& $c '#D9602F'); FB2 = (& $c '#B8431F'); FF1 = (& $c '#FFA15C'); FF2 = (& $c '#FF6B3D'); S1 = (& $c '#FF2D95'); S2 = (& $c '#FF8A3D'); A1 = (& $c '#FFB36B'); A2 = (& $c '#FF5A3D') } }
+            'Emerald'  { return @{ FB1 = (& $c '#1E8F6A'); FB2 = (& $c '#146B50'); FF1 = (& $c '#58D6A6'); FF2 = (& $c '#27B07F'); S1 = (& $c '#2DD4A8'); S2 = (& $c '#0E8F73'); A1 = (& $c '#5FE0B5'); A2 = (& $c '#17A37A') } }
+            'Violet'   { return @{ FB1 = (& $c '#6A3FD0'); FB2 = (& $c '#4D2AA8'); FF1 = (& $c '#B28CFF'); FF2 = (& $c '#8A5CF0'); S1 = (& $c '#B07CFF'); S2 = (& $c '#5E5CE6'); A1 = (& $c '#B28CFF'); A2 = (& $c '#7D3CFF') } }
+        }
+    }
+    return @{}
+}
+
+function Get-M10BasePalette([string]$Theme) {
     if ($Theme -eq 'Light') {
         return @{
             FB1 = (New-M10Col '#5E9BF0'); FB2 = (New-M10Col '#3E80E0')     # folder back
@@ -99,7 +130,7 @@ function Add-M10Stroke($G, $Path, $Color, [single]$Width) {
 # ---------------------------------------------------------------- glyphs for user folders
 function Draw-M10Glyph($G, [string]$Glyph, $P) {
     $white = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 238))
-    $tint  = New-Object System.Drawing.SolidBrush((New-M10Col '#2F7BEA' 210))
+    $tint  = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(210, $P.FF2.R, $P.FF2.G, $P.FF2.B))
     switch ($Glyph) {
         'Documents' {
             $pg = New-M10RoundPath 102 116 52 68 7
@@ -124,6 +155,24 @@ function Draw-M10Glyph($G, [string]$Glyph, $P) {
         }
         'Videos' {
             $G.FillPolygon($white, (New-M10Points @(112,118, 112,186, 168,152)))
+        }
+        'Archive' {
+            foreach ($i in 0..7) {
+                $zx = 120; if ($i % 2 -eq 1) { $zx = 130 }
+                $G.FillRectangle($white, $zx, (94 + $i * 10), 8, 6)
+            }
+            $pull = New-M10RoundPath 117 174 22 30 6
+            $G.FillPath($white, $pull); $pull.Dispose()
+            $G.FillEllipse($tint, 124, 184, 8, 8)
+        }
+        'Objects3D' {
+            $top = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 245))
+            $lft = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 200))
+            $rgt = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 150))
+            $G.FillPolygon($top, (New-M10Points @(128,112, 160,128, 128,144, 96,128)))
+            $G.FillPolygon($lft, (New-M10Points @(96,132, 126,148, 126,186, 96,170)))
+            $G.FillPolygon($rgt, (New-M10Points @(130,148, 160,132, 160,170, 130,186)))
+            $top.Dispose(); $lft.Dispose(); $rgt.Dispose()
         }
         'Desktop' {
             $mon = New-M10RoundPath 96 120 64 42 6
@@ -305,9 +354,58 @@ function Draw-M10Control($G, $P) {
     $sq.Dispose(); $gear.Dispose()
 }
 
+function Draw-M10QuickAccess($G, $P) {
+    Add-M10Shadow $G 28 28 200 200 50
+    $sq = New-M10RoundPath 28 24 200 200 50
+    Add-M10Fill $G $sq $P.A1 $P.A2
+    $pts = New-Object 'System.Collections.Generic.List[System.Drawing.PointF]'
+    for ($i = 0; $i -lt 10; $i++) {
+        $r = 70; if ($i % 2 -eq 1) { $r = 29 }
+        $a = -[Math]::PI / 2 + $i * [Math]::PI / 5
+        $pts.Add((New-Object System.Drawing.PointF([single](128 + $r * [Math]::Cos($a)), [single](128 + $r * [Math]::Sin($a)))))
+    }
+    $w = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 245))
+    $G.FillPolygon($w, $pts.ToArray())
+    $w.Dispose()
+    Add-M10Gloss $G $sq 60
+    $sq.Dispose()
+}
+
+function Draw-M10Libraries($G, $P) {
+    Add-M10Shadow $G 28 28 200 200 50
+    $sq = New-M10RoundPath 28 24 200 200 50
+    Add-M10Fill $G $sq $P.A1 $P.A2
+    $w = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 245))
+    $w2 = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 200))
+    foreach ($b in @(@(70, 80, 30, 92, $w), @(106, 64, 30, 108, $w2), @(142, 88, 30, 84, $w))) {
+        $bp = New-M10RoundPath $b[0] $b[1] $b[2] $b[3] 6
+        $G.FillPath($b[4], $bp); $bp.Dispose()
+    }
+    $base = New-M10RoundPath 60 178 136 10 5
+    $G.FillPath($w, $base); $base.Dispose()
+    $w.Dispose(); $w2.Dispose()
+    Add-M10Gloss $G $sq 60
+    $sq.Dispose()
+}
+
+function Draw-M10OneDrive($G, $P) {
+    Add-M10Shadow $G 28 28 200 200 50
+    $sq = New-M10RoundPath 28 24 200 200 50
+    Add-M10Fill $G $sq $P.A1 $P.A2
+    $w = New-Object System.Drawing.SolidBrush((New-M10Col '#FFFFFF' 245))
+    $G.FillEllipse($w, 62, 116, 62, 62)
+    $G.FillEllipse($w, 92, 80, 80, 80)
+    $G.FillEllipse($w, 134, 106, 66, 66)
+    $cb = New-M10RoundPath 80 134 104 44 22
+    $G.FillPath($w, $cb); $cb.Dispose()
+    $w.Dispose()
+    Add-M10Gloss $G $sq 60
+    $sq.Dispose()
+}
+
 # ---------------------------------------------------------------- public API
-function New-M10IconBitmap([string]$Kind, [int]$Size, [string]$Theme = 'Dark') {
-    $P = Get-M10Palette $Theme
+function New-M10IconBitmap([string]$Kind, [int]$Size, [string]$Theme = 'Dark', [string]$IconTheme = 'Glass') {
+    $P = Get-M10Palette $Theme $IconTheme
     $bmp = New-Object System.Drawing.Bitmap($Size, $Size, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.SmoothingMode = 'AntiAlias'
@@ -333,6 +431,11 @@ function New-M10IconBitmap([string]$Kind, [int]$Size, [string]$Theme = 'Dark') {
         'Music'        { Draw-M10Folder $g $P $false 'Music' }
         'Videos'       { Draw-M10Folder $g $P $false 'Videos' }
         'Desktop'      { Draw-M10Folder $g $P $false 'Desktop' }
+        'Objects3D'    { Draw-M10Folder $g $P $false 'Objects3D' }
+        'Archive'      { Draw-M10Folder $g $P $false 'Archive' }
+        'QuickAccess'  { Draw-M10QuickAccess $g $P }
+        'Libraries'    { Draw-M10Libraries $g $P }
+        'OneDrive'     { Draw-M10OneDrive $g $P }
         default        { Draw-M10Folder $g $P $false '' }
     }
     $g.Dispose()
@@ -340,11 +443,11 @@ function New-M10IconBitmap([string]$Kind, [int]$Size, [string]$Theme = 'Dark') {
 }
 
 # Writes a multi-size .ico (PNG-compressed entries, supported by Windows Vista and newer)
-function Save-M10Ico([string]$Path, [string]$Kind, [string]$Theme = 'Dark') {
+function Save-M10Ico([string]$Path, [string]$Kind, [string]$Theme = 'Dark', [string]$IconTheme = 'Glass') {
     $sizes = @(16, 24, 32, 48, 64, 128, 256)
     $blobs = @()
     foreach ($s in $sizes) {
-        $bmp = New-M10IconBitmap $Kind $s $Theme
+        $bmp = New-M10IconBitmap $Kind $s $Theme $IconTheme
         $ms = New-Object System.IO.MemoryStream
         $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
         $blobs += , ($ms.ToArray())
@@ -370,9 +473,9 @@ function Save-M10Ico([string]$Path, [string]$Kind, [string]$Theme = 'Dark') {
     }
 }
 
-function New-M10IconSet([string]$Dir, [string]$Theme) {
+function New-M10IconSet([string]$Dir, [string]$Theme, [string]$IconTheme = 'Glass') {
     New-Item -ItemType Directory -Path $Dir -Force | Out-Null
     foreach ($k in $script:M10IconKinds) {
-        Save-M10Ico -Path (Join-Path $Dir "$k.ico") -Kind $k -Theme $Theme
+        Save-M10Ico -Path (Join-Path $Dir "$k.ico") -Kind $k -Theme $Theme -IconTheme $IconTheme
     }
 }
