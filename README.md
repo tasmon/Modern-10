@@ -1,5 +1,7 @@
 # Modern 10
 
+A dark and light, glassy, macOS-inspired look for Windows 10. One window, nothing to install, every change backed up and reversible.
+
 ![Version](https://img.shields.io/badge/version-2.0-0A84FF)
 ![Windows](https://img.shields.io/badge/Windows-10-0078D4?logo=windows&logoColor=white)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
@@ -7,7 +9,15 @@
 ![.NET](https://img.shields.io/badge/.NET-System.Drawing-512BD4?logo=dotnet&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-A dark and light, glassy, macOS-inspired look for Windows 10. One window, nothing to install, every change backed up and reversible.
+---
+
+<img width="1918" height="1080" alt="image" src="https://github.com/user-attachments/assets/6773e3f6-800f-4762-93d3-cd7b2fac3aa6" />
+
+---
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/792004c0-e242-442c-8873-06d69cb3763f" />
+
+---
 
 ## Quick start
 
