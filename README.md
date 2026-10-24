@@ -10,6 +10,14 @@ pick the **taskbar icon size** - from a small window (GUI) or from the command l
 
 ---
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0cc5915d-54c4-46c1-8f04-349ff972b5cd" />
+
+---
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4be0b91c-bf8d-4327-ad02-1e81240f0af7" />
+
+---
+
 ## Features
 
 | | |
