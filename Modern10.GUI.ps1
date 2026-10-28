@@ -36,10 +36,13 @@ public static class M10Gui
     public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
     [DllImport("user32.dll")]
     public static extern bool SetProcessDPIAware();
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    public static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
 }
 '@
 }
 [void][M10Gui]::SetProcessDPIAware()
+try { [void][M10Gui]::SetCurrentProcessExplicitAppUserModelID('TasmonIslam.Modern10') } catch { }
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
 $script:EnginePath = Join-Path $script:Root 'Modern10.Engine.ps1'
@@ -57,6 +60,8 @@ $script:Queue    = $null
 $script:SawWarn  = $false
 $script:UiLabels = @(); $script:UiSubs = @(); $script:UiChecks = @(); $script:UiSegs = @(); $script:UiSecBtns = @(); $script:UiCombos = @()
 $script:CustomPath = ''
+$script:UiCards = @()
+$script:Host = $null
 
 # ---------------------------------------------------------------- palette
 function Get-GuiPalette([string]$Theme) {
@@ -78,12 +83,27 @@ function Get-GuiPalette([string]$Theme) {
 function New-Pt([int]$X, [int]$Y) { return New-Object System.Drawing.Point($X, $Y) }
 function New-Sz([int]$W, [int]$H) { return New-Object System.Drawing.Size($W, $H) }
 
+function New-Card([int]$X, [int]$Y, [int]$W, [int]$H) {
+    $c = New-Object System.Windows.Forms.Panel
+    $c.Location = New-Pt $X $Y; $c.Size = New-Sz $W $H
+    $c.Add_Paint({
+        param($sender, $e)
+        if (-not $script:Pal) { return }
+        $pen = New-Object System.Drawing.Pen($script:Pal.Border)
+        $e.Graphics.DrawRectangle($pen, 0, 0, $sender.Width - 1, $sender.Height - 1)
+        $pen.Dispose()
+    })
+    $script:UiCards += $c
+    $form.Controls.Add($c)
+    return $c
+}
+
 function New-Label([string]$Text, [int]$X, [int]$Y, [int]$W, [int]$H, $Font, [string]$Role = 'text') {
     $l = New-Object System.Windows.Forms.Label
     $l.Text = $Text; $l.Location = New-Pt $X $Y; $l.Size = New-Sz $W $H; $l.Font = $Font
     $l.BackColor = [System.Drawing.Color]::Transparent
     if ($Role -eq 'sub') { $script:UiSubs += $l } else { $script:UiLabels += $l }
-    $form.Controls.Add($l)
+    $script:Host.Controls.Add($l)
     return $l
 }
 
@@ -92,7 +112,7 @@ function New-Check([string]$Text, [int]$X, [int]$Y, [bool]$Checked = $true) {
     $c.Text = $Text; $c.Location = New-Pt $X $Y; $c.AutoSize = $true; $c.Checked = $Checked
     $c.Font = $script:FontBody; $c.Cursor = 'Hand'
     $script:UiChecks += $c
-    $form.Controls.Add($c)
+    $script:Host.Controls.Add($c)
     return $c
 }
 
@@ -109,6 +129,7 @@ function Set-SegValue($Panel, [string]$Value) {
 function Update-Segments {
     if (-not $script:Pal) { return }
     foreach ($panel in $script:UiSegs) {
+        $panel.BackColor = $script:Pal.Panel
         foreach ($rb in $panel.Controls) {
             $rb.FlatAppearance.BorderColor = $script:Pal.Border
             $rb.FlatAppearance.CheckedBackColor = $script:Pal.Accent
@@ -117,7 +138,7 @@ function Update-Segments {
                 $rb.ForeColor = [System.Drawing.Color]::White
                 $rb.Font = $script:FontBold
             } else {
-                $rb.BackColor = $script:Pal.Panel
+                $rb.BackColor = $script:Pal.Back
                 $rb.ForeColor = $script:Pal.Text
                 $rb.Font = $script:FontBody
             }
@@ -142,7 +163,7 @@ function New-Segment($Items, [int]$X, [int]$Y, [int]$W, [int]$Index) {
         $panel.Controls.Add($rb)
     }
     $script:UiSegs += $panel
-    $form.Controls.Add($panel)
+    $script:Host.Controls.Add($panel)
     return $panel
 }
 
@@ -151,7 +172,7 @@ function New-Button([string]$Text, [int]$X, [int]$Y, [int]$W, [int]$H, [bool]$Pr
     $b.Text = $Text; $b.Location = New-Pt $X $Y; $b.Size = New-Sz $W $H
     $b.FlatStyle = 'Flat'; $b.Cursor = 'Hand'; $b.Font = $script:FontBold
     if ($Primary) { $b.FlatAppearance.BorderSize = 0 } else { $b.FlatAppearance.BorderSize = 1; $script:UiSecBtns += $b }
-    $form.Controls.Add($b)
+    $script:Host.Controls.Add($b)
     return $b
 }
 
@@ -166,32 +187,46 @@ $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Modern 10'
 $form.AutoScaleDimensions = New-Object System.Drawing.SizeF(96, 96)
 $form.AutoScaleMode = 'Dpi'
-$form.ClientSize = New-Sz 780 740
+$form.ClientSize = New-Sz 820 748
+$form.AutoScroll = $true
 $form.StartPosition = 'CenterScreen'
 $form.FormBorderStyle = 'FixedSingle'
 $form.MaximizeBox = $false
 $form.Font = $script:FontBody
 try {
-    $bmpIco = New-M10IconBitmap 'Folder' 32 'Dark'
-    $form.Icon = [System.Drawing.Icon]::FromHandle($bmpIco.GetHicon())
+    $icoPath = Join-Path $script:Root 'assets\Modern10.ico'
+    if (Test-Path -LiteralPath $icoPath) { $form.Icon = New-Object System.Drawing.Icon($icoPath) }
+    else {
+        $bmpIco = New-M10IconBitmap 'Folder' 32 'Dark'
+        $form.Icon = [System.Drawing.Icon]::FromHandle($bmpIco.GetHicon())
+    }
 } catch { }
 
-[void](New-Label 'Modern 10' 24 12 400 40 $fontTitle 'text')
-[void](New-Label 'Glassy, macOS-inspired Windows 10 - no installs, fully reversible' 26 54 520 20 $script:FontBody 'sub')
+# ---- header: app icon, title, developer credit
+$script:Host = $form
+$logo = New-Object System.Windows.Forms.PictureBox
+$logo.Location = New-Pt 24 18; $logo.Size = New-Sz 52 52; $logo.SizeMode = 'Zoom'
+$logo.BackColor = [System.Drawing.Color]::Transparent
+try {
+    $logoPath = Join-Path $script:Root 'assets\Modern10.png'
+    if (Test-Path -LiteralPath $logoPath) {
+        $lbytes = [System.IO.File]::ReadAllBytes($logoPath)
+        $lms = New-Object System.IO.MemoryStream(, $lbytes)
+        $logo.Image = [System.Drawing.Image]::FromStream($lms)
+    }
+} catch { }
+$form.Controls.Add($logo)
+[void](New-Label 'Modern 10' 86 12 400 38 $fontTitle 'text')
+[void](New-Label 'Glassy, macOS-inspired Windows 10 - reversible, nothing runs in the background' 88 52 480 20 $script:FontBody 'sub')
 
-# developer credit (top right)
-$lblDevCap = New-Label 'DEVELOPED BY' 556 16 200 14 $fontSmall 'sub'
+$lblDevCap = New-Label 'DEVELOPED BY' 596 16 200 14 $fontSmall 'sub'
 $lblDevCap.TextAlign = 'MiddleRight'
-$lblDev = New-Label $script:M10Developer 556 30 200 24 $fontDev 'text'
+$lblDev = New-Label $script:M10Developer 596 30 200 24 $fontDev 'text'
 $lblDev.TextAlign = 'MiddleRight'
-$lblMail = New-Label 'tasmon@outlook.com' 556 54 200 18 $script:FontBody 'sub'
+$lblMail = New-Label 'tasmon@outlook.com' 596 54 200 18 $script:FontBody 'sub'
 $lblMail.TextAlign = 'MiddleRight'
-$lblVer = New-Label ('Version ' + $script:M10Version) 556 72 200 18 $script:FontBody 'sub'
+$lblVer = New-Label ('Version ' + $script:M10Version) 596 72 200 18 $script:FontBody 'sub'
 $lblVer.TextAlign = 'MiddleRight'
-
-[void](New-Label 'THEME' 24 94 170 16 $fontSmall 'sub')
-[void](New-Label 'TASKBAR POSITION' 214 94 170 16 $fontSmall 'sub')
-[void](New-Label 'TASKBAR ICON SIZE' 404 94 220 16 $fontSmall 'sub')
 
 # start with the theme that matches the current Windows mode
 $startTheme = 0
@@ -200,25 +235,30 @@ try {
     if ($cur -eq 1) { $startTheme = 1 }
 } catch { }
 
-$segTheme = New-Segment @(@('Dark', 'Dark'), @('Light', 'Light')) 24 114 170 $startTheme
-$segPos   = New-Segment @(@('Top', 'Top'), @('Bottom', 'Bottom')) 214 114 170 0
-$segSize  = New-Segment @(@('Small', 'Small'), @('Default', 'Default'), @('Keep', 'Keep')) 404 114 352 0
+# ---- card A: theme and taskbar (left column)
+$cardA = New-Card 24 96 384 206
+$script:Host = $cardA
+[void](New-Label 'THEME' 16 14 168 16 $fontSmall 'sub')
+[void](New-Label 'TASKBAR POSITION' 200 14 168 16 $fontSmall 'sub')
+$segTheme = New-Segment @(@('Dark', 'Dark'), @('Light', 'Light')) 16 32 168 $startTheme
+$segPos   = New-Segment @(@('Top', 'Top'), @('Bottom', 'Bottom')) 200 32 168 0
+[void](New-Label 'TASKBAR ICON SIZE' 16 76 168 16 $fontSmall 'sub')
+$segSize  = New-Segment @(@('Small', 'Small'), @('Default', 'Default'), @('Keep', 'Keep')) 16 94 168 0
+$btnDock  = New-Button 'Dock options...' 200 94 168 34 $false
+[void](New-Label 'TASKBAR BEHAVIOUR' 16 138 200 16 $fontSmall 'sub')
+$segBeh   = New-Segment @(@('Keep', 'Keep'), @('Always show', 'Show'), @('Auto-hide', 'AutoHide')) 16 156 352 0
 
-[void](New-Label 'TASKBAR BEHAVIOUR' 24 164 220 16 $fontSmall 'sub')
-$segBeh   = New-Segment @(@('Keep', 'Keep'), @('Always show', 'Show'), @('Auto-hide', 'AutoHide')) 24 184 352 0
-$btnDock  = New-Button 'Dock options...' 404 184 170 34 $false
-
-[void](New-Label 'APPLY' 24 236 200 16 $fontSmall 'sub')
-[void](New-Label 'WALLPAPER' 270 236 200 16 $fontSmall 'sub')
-[void](New-Label 'ICON THEME' 540 236 200 16 $fontSmall 'sub')
-
-$chkWall    = New-Check 'Wallpaper' 24 260
-$chkLock    = New-Check 'Lock screen' 24 288
-$chkRestart = New-Check 'Restart Explorer (recommended)' 24 316
-$chkSys     = New-Check 'System, drive, folder-type icons' 24 344
-$chkFolder  = New-Check 'This PC folder icons' 24 372
-$chkProfile = New-Check 'Profile folder icons' 24 400
-$chkGeneric = New-Check 'All users too (asks for admin)' 24 428
+# ---- card B: what to apply (left column)
+$cardB = New-Card 24 314 384 224
+$script:Host = $cardB
+[void](New-Label 'APPLY' 16 14 200 16 $fontSmall 'sub')
+$chkWall    = New-Check 'Wallpaper' 16 38
+$chkLock    = New-Check 'Lock screen' 16 63
+$chkRestart = New-Check 'Restart Explorer (recommended)' 16 88
+$chkSys     = New-Check 'System, drive, folder-type icons' 16 113
+$chkFolder  = New-Check 'This PC folder icons' 16 138
+$chkProfile = New-Check 'Profile folder icons' 16 163
+$chkGeneric = New-Check 'All users too (asks for admin)' 16 188
 
 $chkSys.Add_CheckedChanged({
     $chkFolder.Enabled  = $chkSys.Checked
@@ -239,33 +279,42 @@ function New-Combo([string[]]$Items, [int]$X, [int]$Y, [int]$W) {
     foreach ($i in $Items) { [void]$c.Items.Add($i) }
     $c.SelectedIndex = 0
     $script:UiCombos += $c
-    $form.Controls.Add($c)
+    $script:Host.Controls.Add($c)
     return $c
 }
 
+# ---- card C: wallpaper and lock screen (right column)
+$cardC = New-Card 424 96 372 219
+$script:Host = $cardC
+[void](New-Label 'WALLPAPER' 16 14 200 16 $fontSmall 'sub')
 $wallItems = @(Get-M10WallpaperStyleNames) + @('Custom image...')
-$cmbWall = New-Combo $wallItems 270 260 250
-$btnBrowse = New-Button 'Browse for your own image...' 270 292 250 30 $false
+$cmbWall = New-Combo $wallItems 16 36 340
+$btnBrowse = New-Button 'Browse for your own image...' 16 68 340 28 $false
 $pbWall = New-Object System.Windows.Forms.PictureBox
-$pbWall.Location = New-Pt 270 326; $pbWall.Size = New-Sz 170 96; $pbWall.SizeMode = 'Zoom'
+$pbWall.Location = New-Pt 16 104; $pbWall.Size = New-Sz 176 99; $pbWall.SizeMode = 'Zoom'
 $pbWall.BorderStyle = 'FixedSingle'
-$form.Controls.Add($pbWall)
-[void](New-Label 'LOCK SCREEN STYLE' 270 428 250 16 $fontSmall 'sub')
-$cmbLock = New-Combo (@('Same as wallpaper') + @(Get-M10WallpaperStyleNames)) 270 446 250
+$cardC.Controls.Add($pbWall)
+[void](New-Label 'LOCK SCREEN' 208 104 148 16 $fontSmall 'sub')
+$cmbLock = New-Combo (@('Same as wallpaper') + @(Get-M10WallpaperStyleNames)) 208 122 148
 
-$cmbIcon = New-Combo @(Get-M10IconThemeNames) 540 260 216
+# ---- card D: icon theme (right column)
+$cardD = New-Card 424 327 372 188
+$script:Host = $cardD
+[void](New-Label 'ICON THEME' 16 14 200 16 $fontSmall 'sub')
+$cmbIcon = New-Combo @(Get-M10IconThemeNames) 16 36 340
 $previewKinds = @('Folder', 'Documents', 'Downloads', 'Objects3D', 'Archive', 'ThisPC', 'Drive', 'RecycleFull', 'User', 'QuickAccess', 'Libraries', 'OneDrive')
 $script:Previews = @()
 for ($i = 0; $i -lt $previewKinds.Count; $i++) {
     $pb = New-Object System.Windows.Forms.PictureBox
-    $pb.Size = New-Sz 48 48
-    $pb.Location = New-Pt (540 + ($i % 4) * 56) (298 + [Math]::Floor($i / 4) * 58)
+    $pb.Size = New-Sz 44 44
+    $pb.Location = New-Pt (16 + ($i % 6) * 56) (76 + [Math]::Floor($i / 6) * 56)
     $pb.SizeMode = 'Zoom'
     $pb.BackColor = [System.Drawing.Color]::Transparent
     $pb.Tag = $previewKinds[$i]
-    $form.Controls.Add($pb)
+    $cardD.Controls.Add($pb)
     $script:Previews += $pb
 }
+$script:Host = $form
 
 function Update-Preview {
     $t = Get-SegValue $segTheme
@@ -316,29 +365,30 @@ $btnBrowse.Add_Click({
     $dlg.Dispose()
 })
 
-$btnApply   = New-Button 'Apply' 24 490 170 42 $true
-$btnRestore = New-Button 'Restore original' 206 490 140 42 $false
-$btnLog     = New-Button 'Open log' 358 490 100 42 $false
-$lblStatus  = New-Label 'Ready' 476 500 280 22 $script:FontBody 'sub'
+# ---- action row, progress and log (full width)
+$btnApply   = New-Button 'Apply' 24 552 170 42 $true
+$btnRestore = New-Button 'Restore original' 206 552 140 42 $false
+$btnLog     = New-Button 'Open log' 358 552 100 42 $false
+$lblStatus  = New-Label 'Ready' 476 562 320 22 $script:FontBody 'sub'
 
 $progress = New-Object System.Windows.Forms.ProgressBar
-$progress.Location = New-Pt 24 542
-$progress.Size = New-Sz 732 6
+$progress.Location = New-Pt 24 602
+$progress.Size = New-Sz 772 6
 $progress.Style = 'Marquee'
 $progress.MarqueeAnimationSpeed = 30
 $progress.Visible = $false
 $form.Controls.Add($progress)
 
 $log = New-Object System.Windows.Forms.RichTextBox
-$log.Location = New-Pt 24 556
-$log.Size = New-Sz 732 148
+$log.Location = New-Pt 24 612
+$log.Size = New-Sz 772 104
 $log.ReadOnly = $true
 $log.BorderStyle = 'FixedSingle'
 $log.Font = New-Object System.Drawing.Font('Consolas', 9)
 $log.DetectUrls = $false
 $form.Controls.Add($log)
 
-$lblFoot = New-Label 'Modern 10 - nothing installed, every change backed up' 24 712 732 20 $script:FontBody 'sub'
+$lblFoot = New-Label 'Modern 10 - nothing runs in the background, every change is backed up' 24 722 772 20 $script:FontBody 'sub'
 
 # ---------------------------------------------------------------- theming
 function Apply-GuiTheme([string]$Theme) {
@@ -348,12 +398,13 @@ function Apply-GuiTheme([string]$Theme) {
     $form.ForeColor = $p.Text
     foreach ($l in $script:UiLabels) { $l.ForeColor = $p.Text }
     foreach ($l in $script:UiSubs)   { $l.ForeColor = $p.Sub }
-    foreach ($c in $script:UiChecks) { $c.ForeColor = $p.Text; $c.BackColor = $p.Back }
+    foreach ($c in $script:UiChecks) { $c.ForeColor = $p.Text; $c.BackColor = $p.Panel }
     foreach ($b in $script:UiSecBtns) {
-        $b.BackColor = $p.Panel; $b.ForeColor = $p.Text; $b.FlatAppearance.BorderColor = $p.Border
+        $b.BackColor = $p.Back; $b.ForeColor = $p.Text; $b.FlatAppearance.BorderColor = $p.Border
     }
-    foreach ($c in $script:UiCombos) { $c.BackColor = $p.Panel; $c.ForeColor = $p.Text }
-    $pbWall.BackColor = $p.Panel
+    foreach ($c in $script:UiCombos) { $c.BackColor = $p.Back; $c.ForeColor = $p.Text }
+    $pbWall.BackColor = $p.Back
+    foreach ($cd in $script:UiCards) { $cd.BackColor = $p.Panel; $cd.Invalidate() }
     $btnApply.BackColor = $p.Accent
     $btnApply.ForeColor = [System.Drawing.Color]::White
     $lblDev.ForeColor = $p.Accent
@@ -510,6 +561,8 @@ function Show-DockWindow {
     $dlg.FormBorderStyle = 'FixedDialog'
     $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false
     $dlg.BackColor = $p.Back; $dlg.ForeColor = $p.Text; $dlg.Font = $script:FontBody
+    try { $dlg.Icon = $form.Icon } catch { }
+    $dlg.ShowInTaskbar = $false
 
     $t = New-Object System.Windows.Forms.Label
     $t.Text = 'Dock-style taskbar'; $t.Font = $fontDev; $t.Location = New-Pt 20 14; $t.Size = New-Sz 600 24
