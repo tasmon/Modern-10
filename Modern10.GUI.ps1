@@ -61,7 +61,7 @@ $script:SawWarn  = $false
 $script:UiLabels = @(); $script:UiSubs = @(); $script:UiChecks = @(); $script:UiSegs = @(); $script:UiSecBtns = @(); $script:UiCombos = @()
 $script:CustomPath = ''
 $script:UiCards = @()
-$script:Host = $null
+$script:UiHost = $null
 
 # ---------------------------------------------------------------- palette
 function Get-GuiPalette([string]$Theme) {
@@ -103,7 +103,7 @@ function New-Label([string]$Text, [int]$X, [int]$Y, [int]$W, [int]$H, $Font, [st
     $l.Text = $Text; $l.Location = New-Pt $X $Y; $l.Size = New-Sz $W $H; $l.Font = $Font
     $l.BackColor = [System.Drawing.Color]::Transparent
     if ($Role -eq 'sub') { $script:UiSubs += $l } else { $script:UiLabels += $l }
-    $script:Host.Controls.Add($l)
+    $script:UiHost.Controls.Add($l)
     return $l
 }
 
@@ -112,7 +112,7 @@ function New-Check([string]$Text, [int]$X, [int]$Y, [bool]$Checked = $true) {
     $c.Text = $Text; $c.Location = New-Pt $X $Y; $c.AutoSize = $true; $c.Checked = $Checked
     $c.Font = $script:FontBody; $c.Cursor = 'Hand'
     $script:UiChecks += $c
-    $script:Host.Controls.Add($c)
+    $script:UiHost.Controls.Add($c)
     return $c
 }
 
@@ -163,7 +163,7 @@ function New-Segment($Items, [int]$X, [int]$Y, [int]$W, [int]$Index) {
         $panel.Controls.Add($rb)
     }
     $script:UiSegs += $panel
-    $script:Host.Controls.Add($panel)
+    $script:UiHost.Controls.Add($panel)
     return $panel
 }
 
@@ -172,7 +172,7 @@ function New-Button([string]$Text, [int]$X, [int]$Y, [int]$W, [int]$H, [bool]$Pr
     $b.Text = $Text; $b.Location = New-Pt $X $Y; $b.Size = New-Sz $W $H
     $b.FlatStyle = 'Flat'; $b.Cursor = 'Hand'; $b.Font = $script:FontBold
     if ($Primary) { $b.FlatAppearance.BorderSize = 0 } else { $b.FlatAppearance.BorderSize = 1; $script:UiSecBtns += $b }
-    $script:Host.Controls.Add($b)
+    $script:UiHost.Controls.Add($b)
     return $b
 }
 
@@ -203,7 +203,7 @@ try {
 } catch { }
 
 # ---- header: app icon, title, developer credit
-$script:Host = $form
+$script:UiHost = $form
 $logo = New-Object System.Windows.Forms.PictureBox
 $logo.Location = New-Pt 24 18; $logo.Size = New-Sz 52 52; $logo.SizeMode = 'Zoom'
 $logo.BackColor = [System.Drawing.Color]::Transparent
@@ -237,7 +237,7 @@ try {
 
 # ---- card A: theme and taskbar (left column)
 $cardA = New-Card 24 96 384 206
-$script:Host = $cardA
+$script:UiHost = $cardA
 [void](New-Label 'THEME' 16 14 168 16 $fontSmall 'sub')
 [void](New-Label 'TASKBAR POSITION' 200 14 168 16 $fontSmall 'sub')
 $segTheme = New-Segment @(@('Dark', 'Dark'), @('Light', 'Light')) 16 32 168 $startTheme
@@ -250,7 +250,7 @@ $segBeh   = New-Segment @(@('Keep', 'Keep'), @('Always show', 'Show'), @('Auto-h
 
 # ---- card B: what to apply (left column)
 $cardB = New-Card 24 314 384 224
-$script:Host = $cardB
+$script:UiHost = $cardB
 [void](New-Label 'APPLY' 16 14 200 16 $fontSmall 'sub')
 $chkWall    = New-Check 'Wallpaper' 16 38
 $chkLock    = New-Check 'Lock screen' 16 63
@@ -279,13 +279,13 @@ function New-Combo([string[]]$Items, [int]$X, [int]$Y, [int]$W) {
     foreach ($i in $Items) { [void]$c.Items.Add($i) }
     $c.SelectedIndex = 0
     $script:UiCombos += $c
-    $script:Host.Controls.Add($c)
+    $script:UiHost.Controls.Add($c)
     return $c
 }
 
 # ---- card C: wallpaper and lock screen (right column)
 $cardC = New-Card 424 96 372 219
-$script:Host = $cardC
+$script:UiHost = $cardC
 [void](New-Label 'WALLPAPER' 16 14 200 16 $fontSmall 'sub')
 $wallItems = @(Get-M10WallpaperStyleNames) + @('Custom image...')
 $cmbWall = New-Combo $wallItems 16 36 340
@@ -299,7 +299,7 @@ $cmbLock = New-Combo (@('Same as wallpaper') + @(Get-M10WallpaperStyleNames)) 20
 
 # ---- card D: icon theme (right column)
 $cardD = New-Card 424 327 372 188
-$script:Host = $cardD
+$script:UiHost = $cardD
 [void](New-Label 'ICON THEME' 16 14 200 16 $fontSmall 'sub')
 $cmbIcon = New-Combo @(Get-M10IconThemeNames) 16 36 340
 $previewKinds = @('Folder', 'Documents', 'Downloads', 'Objects3D', 'Archive', 'ThisPC', 'Drive', 'RecycleFull', 'User', 'QuickAccess', 'Libraries', 'OneDrive')
@@ -314,7 +314,7 @@ for ($i = 0; $i -lt $previewKinds.Count; $i++) {
     $cardD.Controls.Add($pb)
     $script:Previews += $pb
 }
-$script:Host = $form
+$script:UiHost = $form
 
 function Update-Preview {
     $t = Get-SegValue $segTheme
