@@ -66,7 +66,7 @@ Read the log in the window. The full text is saved in `C:\ProgramData\Modern10\m
 - **Icons did not change:** keep *Restart Explorer* ticked, or sign out and back in.
 - **Wallpaper did not change:** check the `Wallpaper check` line in the log. It says if a policy is forcing the wallpaper.
 - **Taskbar did not move:** sign out and back in.
-- **Window does not open:** unblock the ZIP (step 1) and extract it again.
+- **Window does not open:** unblock the ZIP (see Install) and extract it again. Then run `Modern10.Debug.cmd`: it keeps a console open that shows the error. Startup errors are also saved to `%TEMP%\Modern10-startup.log` (app) and `%TEMP%\Modern10-setup.log` (Setup).
 
 ## Safety
 
@@ -83,6 +83,7 @@ Setup.cmd              Installs the app (Start menu, shortcuts, Settings > Apps)
 Modern10.Setup.ps1     The setup window
 Modern10.Uninstall.ps1 Removes the app (started from Settings > Apps)
 Modern10.cmd           Runs the app without installing
+Modern10.Debug.cmd     Runs the app with a visible console (for troubleshooting)
 Modern10.GUI.ps1       The app window
 assets/                App icon (Modern10.ico, Modern10.png)
 Modern10.Engine.ps1    Theme, taskbar, icons, wallpaper, lock screen, restore

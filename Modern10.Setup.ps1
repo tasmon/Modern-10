@@ -15,6 +15,7 @@ if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne 'STA') {
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
+try {
 if (-not ('M10Setup' -as [type])) {
 Add-Type -TypeDefinition @'
 using System;
@@ -262,5 +263,9 @@ $form.Add_Shown({
     [void][M10Setup]::DwmSetWindowAttribute($form.Handle, 19, [ref]$v, 4)
 })
 
-try { [void]$form.ShowDialog() }
-catch { [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, 'Modern 10 Setup', 'OK', 'Error') | Out-Null }
+[void]$form.ShowDialog()
+} catch {
+    $m = "Modern 10 Setup could not start:`n`n" + $_.Exception.Message + "`n`n" + $_.ScriptStackTrace
+    try { Set-Content -LiteralPath (Join-Path $env:TEMP 'Modern10-setup.log') -Value $m } catch { }
+    [System.Windows.Forms.MessageBox]::Show($m, 'Modern 10 Setup', 'OK', 'Error') | Out-Null
+}

@@ -101,6 +101,7 @@ function New-Card([int]$X, [int]$Y, [int]$W, [int]$H) {
 function New-Label([string]$Text, [int]$X, [int]$Y, [int]$W, [int]$H, $Font, [string]$Role = 'text') {
     $l = New-Object System.Windows.Forms.Label
     $l.Text = $Text; $l.Location = New-Pt $X $Y; $l.Size = New-Sz $W $H; $l.Font = $Font
+    $l.AutoSize = $true
     $l.BackColor = [System.Drawing.Color]::Transparent
     if ($Role -eq 'sub') { $script:UiSubs += $l } else { $script:UiLabels += $l }
     $script:UiHost.Controls.Add($l)
@@ -216,17 +217,17 @@ try {
     }
 } catch { }
 $form.Controls.Add($logo)
-[void](New-Label 'Modern 10' 86 12 400 38 $fontTitle 'text')
+[void](New-Label 'Modern 10' 86 10 400 42 $fontTitle 'text')
 [void](New-Label 'Glassy, macOS-inspired Windows 10 - reversible, nothing runs in the background' 88 52 480 20 $script:FontBody 'sub')
 
 $lblDevCap = New-Label 'DEVELOPED BY' 596 16 200 14 $fontSmall 'sub'
-$lblDevCap.TextAlign = 'MiddleRight'
+$lblDevCap.AutoSize = $false; $lblDevCap.Size = New-Sz 220 24; $lblDevCap.Location = New-Pt 576 $lblDevCap.Location.Y; $lblDevCap.TextAlign = 'MiddleRight'
 $lblDev = New-Label $script:M10Developer 596 30 200 24 $fontDev 'text'
-$lblDev.TextAlign = 'MiddleRight'
+$lblDev.AutoSize = $false; $lblDev.Size = New-Sz 220 24; $lblDev.Location = New-Pt 576 $lblDev.Location.Y; $lblDev.TextAlign = 'MiddleRight'
 $lblMail = New-Label 'tasmon@outlook.com' 596 54 200 18 $script:FontBody 'sub'
-$lblMail.TextAlign = 'MiddleRight'
+$lblMail.AutoSize = $false; $lblMail.Size = New-Sz 220 24; $lblMail.Location = New-Pt 576 $lblMail.Location.Y; $lblMail.TextAlign = 'MiddleRight'
 $lblVer = New-Label ('Version ' + $script:M10Version) 596 72 200 18 $script:FontBody 'sub'
-$lblVer.TextAlign = 'MiddleRight'
+$lblVer.AutoSize = $false; $lblVer.Size = New-Sz 220 24; $lblVer.Location = New-Pt 576 $lblVer.Location.Y; $lblVer.TextAlign = 'MiddleRight'
 
 # start with the theme that matches the current Windows mode
 $startTheme = 0
@@ -243,8 +244,8 @@ $script:UiHost = $cardA
 $segTheme = New-Segment @(@('Dark', 'Dark'), @('Light', 'Light')) 16 32 168 $startTheme
 $segPos   = New-Segment @(@('Top', 'Top'), @('Bottom', 'Bottom')) 200 32 168 0
 [void](New-Label 'TASKBAR ICON SIZE' 16 76 168 16 $fontSmall 'sub')
-$segSize  = New-Segment @(@('Small', 'Small'), @('Default', 'Default'), @('Keep', 'Keep')) 16 94 168 0
-$btnDock  = New-Button 'Dock options...' 200 94 168 34 $false
+$segSize  = New-Segment @(@('Small', 'Small'), @('Default', 'Default'), @('Keep', 'Keep')) 16 94 196 0
+$btnDock  = New-Button 'Dock options...' 224 94 144 34 $false
 [void](New-Label 'TASKBAR BEHAVIOUR' 16 138 200 16 $fontSmall 'sub')
 $segBeh   = New-Segment @(@('Keep', 'Keep'), @('Always show', 'Show'), @('Auto-hide', 'AutoHide')) 16 156 352 0
 
@@ -570,7 +571,7 @@ function Show-DockWindow {
 
     $d = New-Object System.Windows.Forms.Label
     $d.Text = "No extra software: the preset below puts the taskbar at the bottom with standard icons and hides it until you move the mouse to the edge (a registry setting). It fills in the options on the main window; press Apply there to use it."
-    $d.Location = New-Pt 20 42; $d.Size = New-Sz 600 54; $d.ForeColor = $p.Sub
+    $d.Location = New-Pt 20 42; $d.Size = New-Sz 600 56; $d.ForeColor = $p.Sub
     $dlg.Controls.Add($d)
 
     $bp = New-Object System.Windows.Forms.Button
@@ -604,7 +605,7 @@ function Show-DockWindow {
         $c.ForeColor = $p.Text; $c.BackColor = $p.Back
         $dlg.Controls.Add($c)
         $s = New-Object System.Windows.Forms.Label
-        $s.Text = $it.Info; $s.ForeColor = $p.Sub; $s.Location = New-Pt 40 ($y + 26); $s.Size = New-Sz 580 50
+        $s.Text = $it.Info; $s.ForeColor = $p.Sub; $s.Location = New-Pt 40 ($y + 26); $s.Size = New-Sz 580 52
         $dlg.Controls.Add($s)
         $lk = New-Object System.Windows.Forms.LinkLabel
         $lk.Text = $it.Url; $lk.Location = New-Pt 40 ($y + 78); $lk.Size = New-Sz 580 18
@@ -706,6 +707,8 @@ Update-WallPreview
 [void]$form.ShowDialog()
 
 } catch {
-    Show-M10Error ("Modern 10 could not start:`n`n" + $_.Exception.Message + "`n`n" + $_.ScriptStackTrace)
+    $msg = "Modern 10 could not start:`n`n" + $_.Exception.Message + "`n`n" + $_.ScriptStackTrace
+    try { Set-Content -LiteralPath (Join-Path $env:TEMP 'Modern10-startup.log') -Value ((Get-Date -Format s) + "`r`n" + $msg + "`r`n" + ($_ | Out-String)) } catch { }
+    Show-M10Error $msg
     exit 1
 }
