@@ -6,16 +6,30 @@
 .DESCRIPTION
     Copies Modern 10 to %LOCALAPPDATA%\Programs\Modern10 (or a folder you choose), adds Start menu and
     optional Desktop shortcuts with the Modern 10 icon, and registers the app in Settings > Apps so it can be
-    uninstalled like any other program. Started by Setup.cmd.
+    uninstalled like any other program. Started by 'Modern 10 Installer.cmd'.
 #>
+[CmdletBinding()]
+param([switch]$Uninstall)
 if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne 'STA') {
-    & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -STA -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File $PSCommandPath
+    & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -STA -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File $PSCommandPath @(if ($Uninstall) { '-Uninstall' })
     exit
 }
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 try {
+if ($Uninstall) {
+    $loc = ''
+    try { $loc = [string](Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Modern10' -ErrorAction Stop).InstallLocation } catch { }
+    $un = ''
+    if ($loc) { $un = Join-Path $loc 'Modern10.Uninstall.ps1' }
+    if ($un -and (Test-Path -LiteralPath $un)) {
+        Start-Process -FilePath "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -ArgumentList @('-STA', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', ('"' + $un + '"'))
+    } else {
+        [System.Windows.Forms.MessageBox]::Show('Modern 10 is not installed for this account.', 'Modern 10 Installer', 'OK', 'Information') | Out-Null
+    }
+    exit
+}
 if (-not ('M10Setup' -as [type])) {
 Add-Type -TypeDefinition @'
 using System;

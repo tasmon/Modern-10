@@ -1,98 +1,128 @@
-# Modern 10
-
-![Version](https://img.shields.io/badge/version-2.1-0A84FF)
-![Windows](https://img.shields.io/badge/Windows-10-0078D4?logo=windows&logoColor=white)
-![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white)
-![Windows Forms](https://img.shields.io/badge/GUI-Windows%20Forms-6E56CF)
-![.NET](https://img.shields.io/badge/.NET-System.Drawing-512BD4?logo=dotnet&logoColor=white)
-![License](https://img.shields.io/badge/license-MIT-green)
+<h1 align="center">Modern 10</h1>
 
 <p align="center"><img src="assets/Modern10.png" width="96" alt="Modern 10 icon"></p>
 
-A dark and light, glassy, macOS-inspired look for Windows 10. One window, every change backed up and reversible.
+<p align="center"><b>Give Windows 10 a glassy, macOS-inspired look. Every change is backed up and reversible.</b></p>
 
-## Install
-
-1. Download this folder. If it came as a ZIP: right-click it > **Properties** > tick **Unblock** > OK, then extract.
-2. Double-click **`Setup.cmd`**, choose a folder if you like, and press **Install**.
-3. Open **Modern 10** from the Start menu (or the Desktop shortcut) and press **Apply**.
-
-Setup installs for your account only, so it needs no administrator rights. It copies the app to `%LOCALAPPDATA%\Programs\Modern10`, adds shortcuts with the Modern 10 icon, and lists Modern 10 in **Settings > Apps**.
-
-**Update:** run `Setup.cmd` from the newer download. **Uninstall:** Settings > Apps > Modern 10 > Uninstall. It offers to restore your original Windows settings first.
-
-**No install?** Double-click `Modern10.cmd` to run it straight from the folder.
-
-## What you can change
-
-| Option | Choices |
-|---|---|
-| Colour mode | Dark or Light for Windows |
-| App theme | The button at the bottom left switches the Modern 10 window itself between light and dark (remembered) |
-| About | Version and developer details |
-| Taskbar | Top or bottom, small or default icons, always show or auto-hide |
-| Wallpaper | 13 styles (Aurora, Waves, Sunset, Ocean, Emerald, Graphite, Nebula, Rose, Midnight, Citrus, Arctic, Dunes, Lagoon) or your own image |
-| Lock screen | Same as the wallpaper, or any of the 13 styles |
-| Icon theme | 11 packs (Glass, Graphite, Sunset, Emerald, Violet, Rose, Amber, Ocean, Crimson, Mint, Midnight) |
-| Icons applied to | This PC, User, Network, Control Panel, Quick access, Libraries, OneDrive, Recycle Bin, drives, ZIP files, the standard folders and every other folder |
-| Dock options | A dock-style preset, plus optional KiraDock and TaskbarX (see below) |
-
-Wallpapers, lock screens and icons are drawn on your PC. Nothing is downloaded.
-
-## Optional dock add-ons
-
-Open **Dock options...** in the app. Nothing is installed unless you tick it and press **Install selected**.
-
-| App | Purpose |
-|---|---|
-| [KiraDock](https://apps.microsoft.com/detail/9NPD1H35D0WD) | A macOS-style floating dock for your favourite apps (Microsoft Store) |
-| [TaskbarX](https://github.com/ChrisAnd1998/TaskbarX/releases) | Centres and animates the taskbar icons (GitHub) |
-
-## Requirements
-
-- Windows 10 with Windows PowerShell 5.1 (already included)
-- No admin rights for most changes. A UAC prompt appears only for the all-users folder and drive icons and the lock screen fallback.
-
-## Good to know
-
-- Restarting Explorer closes open File Explorer windows. Save your work first.
-- Folders with their own custom icon keep it. File-type icons, taskbar app icons and Start tiles are not changed.
-- *Restore original* cannot bring back your old lock screen picture. Choose it again in *Settings > Personalization > Lock screen*.
-- Windows 10 has no real dock, blur or rounded windows without extra software.
-- A work PC can block wallpaper, lock screen or icon changes through policy.
-
-## Troubleshooting
-
-Read the log in the window. The full text is saved in `C:\ProgramData\Modern10\modern10.log`.
-
-- **Icons did not change:** keep *Restart Explorer* ticked, or sign out and back in.
-- **Wallpaper did not change:** check the `Wallpaper check` line in the log. It says if a policy is forcing the wallpaper.
-- **Taskbar did not move:** sign out and back in.
-- **Window does not open:** unblock the ZIP (see Install) and extract it again. Then run `Modern10.Debug.cmd`: it keeps a console open that shows the error. Startup errors are also saved to `%TEMP%\Modern10-startup.log` (app) and `%TEMP%\Modern10-setup.log` (Setup).
-
-## Safety
-
-- The scripts are plain text, so you can read them first.
-- No network connections, no services, no startup entries.
-- Backups and generated files live in `C:\ProgramData\Modern10\`.
-- The uninstaller only removes files Setup created and only works on an installed copy.
-- Only `Modern10.Elevated.ps1` runs as administrator, and it accepts a few fixed actions.
-
-## Files
-
-```
-Setup.cmd              Installs the app (Start menu, shortcuts, Settings > Apps)
-Modern10.Setup.ps1     The setup window
-Modern10.Uninstall.ps1 Removes the app (started from Settings > Apps)
-Modern10.cmd           Runs the app without installing
-Modern10.Debug.cmd     Runs the app with a visible console (for troubleshooting)
-Modern10.GUI.ps1       The app window
-assets/                App icon (Modern10.ico, Modern10.png)
-Modern10.Engine.ps1    Theme, taskbar, icons, wallpaper, lock screen, restore
-Modern10.Icons.ps1     Icon drawing
-Modern10.Elevated.ps1  Small admin helper
-```
+<p align="center">
+<img alt="Version" src="https://img.shields.io/badge/version-2.2-0A84FF">
+<img alt="Windows" src="https://img.shields.io/badge/Windows-10-0078D4?logo=windows&logoColor=white">
+<img alt="PowerShell" src="https://img.shields.io/badge/PowerShell-5.1-5391FE?logo=powershell&logoColor=white">
+<img alt="GUI" src="https://img.shields.io/badge/GUI-Windows%20Forms-6E56CF">
+<img alt="License" src="https://img.shields.io/badge/license-MIT-green">
+</p>
 
 ---
 
-MIT License. Developed by **Tasmon Islam** - tasmon@outlook.com
+## Features
+
+- **Look:** Windows dark or light mode, with a matching accent colour.
+- **Wallpaper and lock screen:** 13 built-in glass designs (dark and light versions), or your own picture. A live preview shows your choice.
+- **Icons:** 11 icon packs for This PC, drives, Quick access, Libraries, OneDrive, the Recycle Bin, ZIP files and every folder.
+- **Taskbar:** top or bottom, small or default icons, always visible or auto-hide.
+- **Dock options:** a dock-style preset, plus optional KiraDock and TaskbarX (installed only if you choose them).
+- **Safe:** every value is backed up first, and one button puts everything back.
+- **Light or dark app:** the Modern 10 window has its own theme switch, remembered between runs.
+- **Private:** nothing runs in the background and nothing is downloaded. The only network use is the update check, when you press it.
+
+## Install
+
+1. Download this repository and extract it. If you downloaded a ZIP: right-click it > **Properties** > tick **Unblock** > OK, then extract.
+2. Double-click **`Modern 10 Installer.cmd`** and choose **1**.
+3. Press **Install** in the window that opens, then open **Modern 10** from the Start menu.
+
+The installer works for your account only and needs no administrator rights. It copies the app to `%LOCALAPPDATA%\Programs\Modern10`, adds Start menu and Desktop shortcuts with the Modern 10 icon, and lists Modern 10 in **Settings > Apps**.
+
+**Without installing:** double-click `Modern10.cmd` to run straight from the folder. On the first run, the app offers to install itself.
+
+**Update:** open **About > Check for updates**, or run the installer again from a newer download.
+
+## Using Modern 10
+
+The window has a menu on the left and one page at a time:
+
+| Page | What you do |
+|---|---|
+| 1. Look | Choose dark or light for Windows |
+| 2. Wallpaper & lock screen | Pick a design or your own picture; pick the lock screen style |
+| 3. Icons | Pick an icon pack and what it should cover |
+| 4. Taskbar | Position, icon size, auto-hide, and Dock options |
+| About | Version and developer, open the log folder, check for updates, uninstall |
+
+Press **Apply** to make the changes. Press **Restore original** to put everything back. The log at the bottom shows each step, and `C:\ProgramData\Modern10\modern10.log` keeps the full text.
+
+## What it changes
+
+All changes are per user (`HKCU`), except the optional all-users folder icons and the lock screen fallback, which ask for permission.
+
+| Area | Setting |
+|---|---|
+| Colour mode and accent | `AppsUseLightTheme`, `SystemUsesLightTheme`, `EnableTransparency`, DWM accent colours |
+| Taskbar | `StuckRects3` / `MMStuckRects3` (position, auto-hide), `TaskbarSmallIcons`, a few tidy-up values |
+| Icons | `HKCU\Software\Classes` keys for `CLSID\{GUID}\DefaultIcon`, `Folder`, `Directory`, `Drive`, `CompressedFolder`, drive icons, and `desktop.ini` in profile folders |
+| Wallpaper | `IDesktopWallpaper`, `Control Panel\Desktop`, slideshow switched off |
+| Lock screen | Per-user `LockScreen.SetImageFileAsync`; admin policy fallback only if that fails |
+
+Backups and generated files live in `C:\ProgramData\Modern10\`.
+
+## Safety and undo
+
+- Press **Restore original** in the app to put back your settings, icons and taskbar.
+- Restoring cannot bring back your old lock screen picture; choose it again in *Settings > Personalization > Lock screen*.
+- Restarting Explorer closes open File Explorer windows. Save your work first.
+- Consider creating a System Restore point before first use.
+
+## Uninstall
+
+Use any one of these:
+
+- **Settings > Apps > Modern 10 > Uninstall**
+- **About > Uninstall Modern 10** in the app
+- `Modern 10 Installer.cmd`, option **2**
+
+The uninstaller offers to restore your original Windows settings first. It only removes files the installer created.
+
+## Requirements
+
+- Windows 10 (1809 or newer) with Windows PowerShell 5.1, already included
+- No administrator rights for the normal path
+
+## Troubleshooting
+
+- **The window does not open:** run `Modern10.Debug.cmd` to see the error. Startup errors are also saved to `%TEMP%\Modern10-startup.log` and `%TEMP%\Modern10-setup.log`.
+- **Icons did not change:** keep *Restart Explorer* ticked, or sign out and back in. A work PC can lock icon settings through policy.
+- **Wallpaper did not change:** check the `Wallpaper check` line in the log. It says if a policy is forcing the wallpaper.
+- **Taskbar did not move:** sign out and back in.
+- **Windows warns about the files:** right-click the ZIP > Properties > Unblock, then extract again.
+
+## Project layout
+
+```
+Modern 10 Installer.cmd  Menu: install or update, uninstall
+Modern10.cmd             Runs the app without installing
+Modern10.Debug.cmd       Runs the app with a visible console
+Modern10.GUI.ps1         The app window
+Modern10.Engine.ps1      Theme, taskbar, icons, wallpaper, lock screen, restore
+Modern10.Icons.ps1       Icon drawing
+Modern10.Elevated.ps1    Small admin helper (runs only after a permission prompt)
+Modern10.Setup.ps1       Installer window
+Modern10.Uninstall.ps1   Uninstaller
+version.txt              Current version number (read by the update check)
+assets/                  App icon
+```
+
+## Contributing
+
+Keep all code plain ASCII and compatible with Windows PowerShell 5.1. Run a syntax check before sending changes, and bump the version in `Modern10.Engine.ps1` and `version.txt` together.
+
+## Disclaimer
+
+Modern 10 changes registry settings, icons and the taskbar. It is provided as is, without warranty. Read the scripts before you run them.
+
+## License
+
+MIT - see `LICENSE`.
+
+## Developer
+
+Developed by **Tasmon Islam** - tasmon@outlook.com

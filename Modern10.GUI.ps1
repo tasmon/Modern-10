@@ -184,7 +184,7 @@ $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Modern 10'
 $form.AutoScaleDimensions = New-Object System.Drawing.SizeF(96, 96)
 $form.AutoScaleMode = 'Dpi'
-$form.ClientSize = New-Sz 860 600
+$form.ClientSize = New-Sz 940 780
 $form.StartPosition = 'CenterScreen'
 $form.Font = $script:FontBody
 try {
@@ -197,7 +197,7 @@ $script:UiLabels = @(); $script:UiSubs = @(); $script:UiAccent = @(); $script:Ui
 $header = New-Object System.Windows.Forms.Panel
 $header.Dock = 'Top'; $header.Height = 84; $header.Padding = New-Pad 18 10 18 4
 $bottom = New-Object System.Windows.Forms.Panel
-$bottom.Dock = 'Bottom'; $bottom.Height = 196; $bottom.Padding = New-Pad 18 0 18 10
+$bottom.Dock = 'Bottom'; $bottom.Height = 190; $bottom.Padding = New-Pad 18 0 18 10
 $body = New-Object System.Windows.Forms.Panel
 $body.Dock = 'Fill'
 # the fill panel goes in first, the docked edges after it
@@ -318,7 +318,22 @@ Add-Caption $pAbout 'DEVELOPED BY'
 $lblDev = New-Lbl $pAbout $script:M10Developer $fontDev 'accent' 0 (New-Pad 0 0 0 2)
 [void](New-Lbl $pAbout 'tasmon@outlook.com' $script:FontBody 'sub' 0 (New-Pad 0 0 0 14))
 Add-Caption $pAbout 'LICENSE'
-[void](New-Lbl $pAbout 'MIT License - free to use, change and share.' $script:FontBody 'sub' 0 (New-Pad 0 0 0 0))
+[void](New-Lbl $pAbout 'MIT License - free to use, change and share.' $script:FontBody 'sub' 0 (New-Pad 0 0 0 16))
+Add-Caption $pAbout 'MAINTENANCE'
+$btnLogDir  = New-Btn $pAbout 'Open log folder' 220 36 $false
+$btnLogDir.Margin = New-Pad 0 0 0 8
+$btnUpdate  = New-Btn $pAbout 'Check for updates' 220 36 $false
+$btnUpdate.Margin = New-Pad 0 0 0 8
+$btnUninst  = New-Btn $pAbout 'Uninstall Modern 10' 220 36 $false
+$btnUninst.Margin = New-Pad 0 0 0 8
+$lblUpdate  = New-Lbl $pAbout 'Checking for updates only happens when you press the button (it reads one small version file from GitHub).' $script:FontBody 'sub' 560 (New-Pad 0 2 0 0)
+
+# a little empty space at the end of every page, so the last control can always be scrolled fully into view
+foreach ($pg in $script:Pages) {
+    $sp = New-Object System.Windows.Forms.Panel
+    $sp.Size = New-Sz 10 64; $sp.Margin = New-Pad 0 0 0 0
+    $pg.Controls.Add($sp)
+}
 
 # ---- menu buttons (added in reverse so the first one ends up on top)
 $navNames = @('1. Look', '2. Wallpaper & lock screen', '3. Icons', '4. Taskbar')
@@ -767,6 +782,67 @@ $btnTheme.Add_Click({
     Apply-GuiTheme $script:AppTheme
 })
 
+function Get-InstalledLocation {
+    try { return [string](Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Modern10' -ErrorAction Stop).InstallLocation } catch { return '' }
+}
+
+function Start-M10Script([string]$Path) {
+    Start-Process -FilePath (Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe') -ArgumentList @('-STA', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden', '-File', ('"' + $Path + '"'))
+}
+
+$script:RepoVersionUrl = 'https://raw.githubusercontent.com/tasmon/Modern-10/main/version.txt'
+$script:RepoZipUrl     = 'https://github.com/tasmon/Modern-10/archive/refs/heads/main.zip'
+
+$btnLogDir.Add_Click({
+    try {
+        if (-not (Test-Path -LiteralPath $script:DataDir)) { New-Item -ItemType Directory -Path $script:DataDir -Force | Out-Null }
+        Start-Process explorer.exe -ArgumentList ('"{0}"' -f $script:DataDir)
+    } catch { }
+})
+
+$btnUninst.Add_Click({
+    $loc = Get-InstalledLocation
+    $un = ''
+    if ($loc) { $un = Join-Path $loc 'Modern10.Uninstall.ps1' }
+    if ($loc -and ($loc.TrimEnd('\') -ieq $script:Root.TrimEnd('\')) -and (Test-Path -LiteralPath $un)) {
+        Start-M10Script $un
+        $form.Close()
+    } else {
+        [System.Windows.Forms.MessageBox]::Show("This copy of Modern 10 was not installed with the installer, so there is nothing to uninstall.`nRun 'Modern 10 Installer.cmd' and choose Install first, or just delete this folder.", 'Modern 10', 'OK', 'Information') | Out-Null
+    }
+})
+
+$btnUpdate.Add_Click({
+    $lblUpdate.Text = 'Checking...'
+    $form.Refresh()
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+        $txt = [string](Invoke-WebRequest -Uri $script:RepoVersionUrl -UseBasicParsing -TimeoutSec 15).Content
+        $remote = [version](($txt -split "`r?`n")[0].Trim())
+        $local = [version]$script:M10Version
+        if ($remote -le $local) {
+            $lblUpdate.Text = ('You have the latest version (' + $local + ').')
+            return
+        }
+        $r = [System.Windows.Forms.MessageBox]::Show(("Version {0} is available (you have {1}).`n`nDownload it and open the installer now?" -f $remote, $local), 'Modern 10', 'YesNo', 'Question')
+        if ($r -ne 'Yes') { $lblUpdate.Text = ('Version ' + $remote + ' is available.'); return }
+        $lblUpdate.Text = 'Downloading...'
+        $form.Refresh()
+        $tmp = Join-Path $env:TEMP ('Modern10-update-' + [guid]::NewGuid().ToString('N'))
+        New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+        $zip = Join-Path $tmp 'main.zip'
+        Invoke-WebRequest -Uri $script:RepoZipUrl -OutFile $zip -UseBasicParsing -TimeoutSec 120
+        Expand-Archive -LiteralPath $zip -DestinationPath (Join-Path $tmp 'x') -Force
+        $setup = Get-ChildItem -LiteralPath (Join-Path $tmp 'x') -Recurse -Filter 'Modern10.Setup.ps1' | Select-Object -First 1
+        if (-not $setup) { throw 'The download did not contain the installer.' }
+        Get-ChildItem -LiteralPath (Join-Path $tmp 'x') -Recurse -File | Unblock-File -ErrorAction SilentlyContinue
+        Start-M10Script $setup.FullName
+        $form.Close()
+    } catch {
+        $lblUpdate.Text = 'Could not check for updates: ' + $_.Exception.Message
+    }
+})
+
 $form.Add_Shown({
     try {
         $wa = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
@@ -776,6 +852,18 @@ $form.Add_Shown({
         $form.Top = $wa.Top + [int](($wa.Height - $form.Height) / 2)
     } catch { }
     Apply-GuiTheme $script:AppTheme
+    # first run from a downloaded folder: offer to install (Start menu, Settings > Apps)
+    try {
+        $setupPath = Join-Path $script:Root 'Modern10.Setup.ps1'
+        $skip = $false
+        try { $skip = ([int](Get-ItemProperty -LiteralPath 'HKCU:\Software\Modern10' -ErrorAction Stop).SkipInstallPrompt -eq 1) } catch { }
+        if ((-not (Get-InstalledLocation)) -and (Test-Path -LiteralPath $setupPath) -and (-not $skip)) {
+            $ans = [System.Windows.Forms.MessageBox]::Show("Install Modern 10 on this PC?`n`nThis adds a Start menu shortcut and an entry in Settings > Apps. It needs no administrator rights.`n`nYes = open the installer`nNo = keep running from this folder (you won't be asked again)", 'Modern 10', 'YesNo', 'Question')
+            if ($ans -eq 'Yes') { Start-M10Script $setupPath; $form.Close(); return }
+            if (-not (Test-Path -LiteralPath 'HKCU:\Software\Modern10')) { New-Item -Path 'HKCU:\Software\Modern10' -Force | Out-Null }
+            New-ItemProperty -LiteralPath 'HKCU:\Software\Modern10' -Name 'SkipInstallPrompt' -Value 1 -PropertyType DWord -Force | Out-Null
+        }
+    } catch { }
     Add-LogLine '> Pick your options and press Apply. Everything can be undone with "Restore original".' $script:Pal.Sub
 })
 

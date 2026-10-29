@@ -5,7 +5,7 @@
 # Developer: Tasmon Islam
 
 $script:M10Root      = $PSScriptRoot
-$script:M10Version   = '2.1'
+$script:M10Version   = '2.2'
 $script:M10Developer = 'Tasmon Islam'
 $script:DataDir      = Join-Path $env:ProgramData 'Modern10'
 $script:BackupFile   = Join-Path $script:DataDir 'backup.json'
