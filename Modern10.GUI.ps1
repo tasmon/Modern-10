@@ -184,8 +184,7 @@ $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Modern 10'
 $form.AutoScaleDimensions = New-Object System.Drawing.SizeF(96, 96)
 $form.AutoScaleMode = 'Dpi'
-$form.ClientSize = New-Sz 900 740
-$form.MinimumSize = New-Sz 840 600
+$form.ClientSize = New-Sz 860 600
 $form.StartPosition = 'CenterScreen'
 $form.Font = $script:FontBody
 try {
@@ -198,7 +197,7 @@ $script:UiLabels = @(); $script:UiSubs = @(); $script:UiAccent = @(); $script:Ui
 $header = New-Object System.Windows.Forms.Panel
 $header.Dock = 'Top'; $header.Height = 84; $header.Padding = New-Pad 18 10 18 4
 $bottom = New-Object System.Windows.Forms.Panel
-$bottom.Dock = 'Bottom'; $bottom.Height = 220; $bottom.Padding = New-Pad 18 0 18 10
+$bottom.Dock = 'Bottom'; $bottom.Height = 196; $bottom.Padding = New-Pad 18 0 18 10
 $body = New-Object System.Windows.Forms.Panel
 $body.Dock = 'Fill'
 # the fill panel goes in first, the docked edges after it
@@ -207,20 +206,11 @@ $form.Controls.Add($bottom)
 $form.Controls.Add($header)
 
 # ---- header: icon, title, developer credit
-$titlePanel = New-Object System.Windows.Forms.Panel
-$titlePanel.Dock = 'Fill'
-$lblTitle = New-Lbl $titlePanel 'Modern 10' $fontTitle 'text'
-$lblTitle.Location = New-Pt 6 2
-$lblSub = New-Lbl $titlePanel 'A glassy, macOS-inspired look for Windows 10' $script:FontBody 'sub'
-$lblSub.Location = New-Pt 10 46
-
-$devFlow = New-Object System.Windows.Forms.FlowLayoutPanel
-$devFlow.Dock = 'Right'; $devFlow.FlowDirection = 'TopDown'; $devFlow.WrapContents = $false
-$devFlow.AutoSize = $true; $devFlow.AutoSizeMode = 'GrowAndShrink'; $devFlow.Padding = New-Pad 0 2 0 0
-[void](New-Lbl $devFlow 'DEVELOPED BY' $fontSmall 'sub' 0 (New-Pad 0 0 0 0))
-$lblDev = New-Lbl $devFlow $script:M10Developer $fontDev 'accent' 0 (New-Pad 0 0 0 0)
-[void](New-Lbl $devFlow 'tasmon@outlook.com' $script:FontBody 'sub' 0 (New-Pad 0 0 0 0))
-[void](New-Lbl $devFlow ('Version ' + $script:M10Version) $script:FontBody 'sub' 0 (New-Pad 0 0 0 0))
+$titleFlow = New-Object System.Windows.Forms.FlowLayoutPanel
+$titleFlow.Dock = 'Fill'; $titleFlow.FlowDirection = 'TopDown'; $titleFlow.WrapContents = $false
+$titleFlow.Padding = New-Pad 4 2 0 0
+$lblTitle = New-Lbl $titleFlow 'Modern 10' $fontTitle 'text' 0 (New-Pad 0 0 0 0)
+$lblSub = New-Lbl $titleFlow 'A glassy, macOS-inspired look for Windows 10' $script:FontBody 'sub' 0 (New-Pad 4 0 0 0)
 
 $logo = New-Object System.Windows.Forms.PictureBox
 $logo.Dock = 'Left'; $logo.Width = 66; $logo.SizeMode = 'Zoom'
@@ -232,8 +222,7 @@ try {
         $logo.Image = [System.Drawing.Image]::FromStream($lms)
     }
 } catch { }
-$header.Controls.Add($titlePanel)
-$header.Controls.Add($devFlow)
+$header.Controls.Add($titleFlow)
 $header.Controls.Add($logo)
 
 # ---- body: menu on the left, one page at a time on the right
@@ -251,10 +240,18 @@ try {
     if ($cur -eq 1) { $startTheme = 1 }
 } catch { }
 
+# the app's own appearance: saved choice, otherwise it follows Windows
+$script:AppTheme = 'Dark'
+if ($startTheme -eq 1) { $script:AppTheme = 'Light' }
+try {
+    $savedTheme = [string](Get-ItemProperty -LiteralPath 'HKCU:\Software\Modern10' -ErrorAction Stop).AppTheme
+    if ($savedTheme -eq 'Dark' -or $savedTheme -eq 'Light') { $script:AppTheme = $savedTheme }
+} catch { }
+
 # ---- page 1: look
 $pLook = New-Page
-Add-Heading $pLook '1. Look' 'Pick dark or light. This sets the colours of Windows apps and the taskbar, and the wallpaper, lock screen and icons you create here follow it.'
-Add-Caption $pLook 'COLOUR MODE'
+Add-Heading $pLook '1. Look' 'Pick dark or light for Windows apps and the taskbar. The wallpaper, lock screen and icons shown here follow your choice. (The button at the bottom left switches this app between light and dark.)'
+Add-Caption $pLook 'WINDOWS COLOUR MODE'
 $segTheme = Add-Radios $pLook @(@('Dark', 'Dark'), @('Light', 'Light')) $startTheme
 $chkRestart = Add-Check $pLook 'Restart Explorer when applying (recommended, so changes show straight away)' $true
 Add-Note $pLook 'Nothing is changed until you press Apply. You can always go back with Restore original.'
@@ -308,17 +305,46 @@ $btnDock = New-Btn $pTask 'Dock options...' 180 34 $false
 $btnDock.Margin = New-Pad 0 14 0 0
 Add-Note $pTask 'Dock options offers a one-click dock-style preset and two optional apps, KiraDock and TaskbarX.'
 
+# ---- page 5: about (the developer credit lives here)
+$pAbout = New-Page
+$aboutLogo = New-Object System.Windows.Forms.PictureBox
+$aboutLogo.Size = New-Sz 96 96; $aboutLogo.SizeMode = 'Zoom'; $aboutLogo.Margin = New-Pad 0 0 0 10
+$aboutLogo.Image = $logo.Image
+$pAbout.Controls.Add($aboutLogo)
+[void](New-Lbl $pAbout 'Modern 10' $fontTitle 'text' 0 (New-Pad 0 0 0 0))
+[void](New-Lbl $pAbout ('Version ' + $script:M10Version) $script:FontBody 'sub' 0 (New-Pad 2 0 0 14))
+[void](New-Lbl $pAbout 'A glassy, macOS-inspired look for Windows 10. Nothing runs in the background and every change can be undone.' $script:FontBody 'text' 560 (New-Pad 0 0 0 18))
+Add-Caption $pAbout 'DEVELOPED BY'
+$lblDev = New-Lbl $pAbout $script:M10Developer $fontDev 'accent' 0 (New-Pad 0 0 0 2)
+[void](New-Lbl $pAbout 'tasmon@outlook.com' $script:FontBody 'sub' 0 (New-Pad 0 0 0 14))
+Add-Caption $pAbout 'LICENSE'
+[void](New-Lbl $pAbout 'MIT License - free to use, change and share.' $script:FontBody 'sub' 0 (New-Pad 0 0 0 0))
+
 # ---- menu buttons (added in reverse so the first one ends up on top)
 $navNames = @('1. Look', '2. Wallpaper & lock screen', '3. Icons', '4. Taskbar')
 for ($i = $navNames.Count - 1; $i -ge 0; $i--) {
     $nb = New-Object System.Windows.Forms.Button
     $nb.Text = $navNames[$i]; $nb.Tag = $i; $nb.Dock = 'Top'; $nb.Height = 46
     $nb.FlatStyle = 'Flat'; $nb.FlatAppearance.BorderSize = 0; $nb.Cursor = 'Hand'
-    $nb.TextAlign = 'MiddleLeft'; $nb.Padding = New-Pad 10 0 4 0; $nb.Font = $script:FontBody
+    $nb.UseMnemonic = $false; $nb.TextAlign = 'MiddleLeft'; $nb.Padding = New-Pad 10 0 4 0; $nb.Font = $script:FontBody
     $nb.Add_Click({ Show-Page ([int]$this.Tag) })
     $nav.Controls.Add($nb)
     $script:NavButtons = @($nb) + $script:NavButtons
 }
+
+$btnTheme = New-Object System.Windows.Forms.Button
+$btnTheme.Dock = 'Bottom'; $btnTheme.Height = 40; $btnTheme.FlatStyle = 'Flat'; $btnTheme.Cursor = 'Hand'
+$btnTheme.Font = $script:FontBody; $btnTheme.FlatAppearance.BorderSize = 1; $btnTheme.TextAlign = 'MiddleLeft'
+$btnTheme.Padding = New-Pad 10 0 4 0
+$script:UiSecBtns += $btnTheme
+$nav.Controls.Add($btnTheme)
+$nbAbout = New-Object System.Windows.Forms.Button
+$nbAbout.Text = 'About'; $nbAbout.Tag = 4; $nbAbout.Dock = 'Bottom'; $nbAbout.Height = 46
+$nbAbout.FlatStyle = 'Flat'; $nbAbout.FlatAppearance.BorderSize = 0; $nbAbout.Cursor = 'Hand'
+$nbAbout.TextAlign = 'MiddleLeft'; $nbAbout.Padding = New-Pad 10 0 4 0; $nbAbout.Font = $script:FontBody
+$nbAbout.Add_Click({ Show-Page ([int]$this.Tag) })
+$nav.Controls.Add($nbAbout)
+$script:NavButtons = @($script:NavButtons) + @($nbAbout)
 
 function Update-Nav {
     if (-not $script:Pal) { return }
@@ -433,6 +459,7 @@ function Apply-GuiTheme([string]$Theme) {
     $form.BackColor = $p.Back
     $form.ForeColor = $p.Text
     $nav.BackColor = $p.Panel
+    if ($Theme -eq 'Light') { $btnTheme.Text = 'Switch to dark app theme' } else { $btnTheme.Text = 'Switch to light app theme' }
     foreach ($l in $script:UiLabels) { $l.ForeColor = $p.Text }
     foreach ($l in $script:UiSubs)   { $l.ForeColor = $p.Sub }
     foreach ($l in $script:UiAccent) { $l.ForeColor = $p.Accent }
@@ -456,7 +483,6 @@ function Apply-GuiTheme([string]$Theme) {
 foreach ($rb in $segTheme.Controls) {
     $rb.Add_CheckedChanged({
         if ($this.Checked) {
-            Apply-GuiTheme (Get-SegValue $segTheme)
             Update-Preview
             Update-WallPreview
         }
@@ -732,18 +758,29 @@ $form.Add_FormClosing({
     }
 })
 
+$btnTheme.Add_Click({
+    if ($script:AppTheme -eq 'Dark') { $script:AppTheme = 'Light' } else { $script:AppTheme = 'Dark' }
+    try {
+        if (-not (Test-Path -LiteralPath 'HKCU:\Software\Modern10')) { New-Item -Path 'HKCU:\Software\Modern10' -Force | Out-Null }
+        New-ItemProperty -LiteralPath 'HKCU:\Software\Modern10' -Name 'AppTheme' -Value $script:AppTheme -PropertyType String -Force | Out-Null
+    } catch { }
+    Apply-GuiTheme $script:AppTheme
+})
+
 $form.Add_Shown({
     try {
         $wa = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
-        if ($form.Height -gt $wa.Height) { $form.Height = $wa.Height; $form.Top = $wa.Top }
-        if ($form.Width -gt $wa.Width) { $form.Width = $wa.Width; $form.Left = $wa.Left }
+        if ($form.Height -gt $wa.Height) { $form.Height = $wa.Height }
+        if ($form.Width -gt $wa.Width) { $form.Width = $wa.Width }
+        $form.Left = $wa.Left + [int](($wa.Width - $form.Width) / 2)
+        $form.Top = $wa.Top + [int](($wa.Height - $form.Height) / 2)
     } catch { }
-    Apply-GuiTheme (Get-SegValue $segTheme)
+    Apply-GuiTheme $script:AppTheme
     Add-LogLine '> Pick your options and press Apply. Everything can be undone with "Restore original".' $script:Pal.Sub
 })
 
 # initial paint
-Apply-GuiTheme (Get-SegValue $segTheme)
+Apply-GuiTheme $script:AppTheme
 Update-Preview
 Update-WallPreview
 [void]$form.ShowDialog()

@@ -27,7 +27,9 @@ Setup installs for your account only, so it needs no administrator rights. It co
 
 | Option | Choices |
 |---|---|
-| Theme | Dark or Light |
+| Colour mode | Dark or Light for Windows |
+| App theme | The button at the bottom left switches the Modern 10 window itself between light and dark (remembered) |
+| About | Version and developer details |
 | Taskbar | Top or bottom, small or default icons, always show or auto-hide |
 | Wallpaper | 13 styles (Aurora, Waves, Sunset, Ocean, Emerald, Graphite, Nebula, Rose, Midnight, Citrus, Arctic, Dunes, Lagoon) or your own image |
 | Lock screen | Same as the wallpaper, or any of the 13 styles |
