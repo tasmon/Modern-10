@@ -151,7 +151,7 @@ $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Modern 10 Setup'
 $form.AutoScaleDimensions = New-Object System.Drawing.SizeF(96, 96)
 $form.AutoScaleMode = 'Dpi'
-$form.ClientSize = New-Object System.Drawing.Size(540, 430)
+$form.ClientSize = New-Object System.Drawing.Size(540, 452)
 $form.StartPosition = 'CenterScreen'
 $form.FormBorderStyle = 'FixedDialog'
 $form.MaximizeBox = $false; $form.MinimizeBox = $true
@@ -193,16 +193,18 @@ $chkDesk   = New-Chk 'Create a Desktop shortcut' 28 238 $true
 $chkLaunch = New-Chk 'Open Modern 10 when setup finishes' 28 264 $true
 
 $note = New-Lbl ("Installs for your account only - no administrator rights needed. Modern 10 appears in Settings > Apps, where you can uninstall it. " +
-                 "Your Windows settings are not changed until you press Apply inside Modern 10.") 28 298 484 48 $fBody $cSub
+                 "Your Windows settings are not changed until you press Apply inside Modern 10.") 28 296 484 58 $fBody $cSub
+$note.AutoSize = $false; $note.Size = New-Object System.Drawing.Size(484, 58)
 
 $progress = New-Object System.Windows.Forms.ProgressBar
 $progress.Style = 'Marquee'; $progress.MarqueeAnimationSpeed = 30; $progress.Visible = $false
-[void](Add-Ctl $progress 28 356 484 6)
-$lblStatus = New-Lbl '' 28 366 484 20 $fBody $cSub
+[void](Add-Ctl $progress 28 362 484 6)
+$lblStatus = New-Lbl '' 28 374 250 22 $fBody $cSub
+$lblStatus.AutoSize = $false
 
 $goText = 'Install'; if ($isUpdate) { $goText = 'Update' }
-$btnGo = New-Btn $goText 292 386 120 34 $true
-$btnCancel = New-Btn 'Cancel' 422 386 90 34 $false
+$btnGo = New-Btn $goText 292 402 120 34 $true
+$btnCancel = New-Btn 'Cancel' 422 402 90 34 $false
 $script:Done = $false
 $script:FinalDest = ''
 
